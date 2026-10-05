@@ -20,8 +20,8 @@ parser:
 bot:
   msg:
     help_text_fmt: |
-      SaveAny-Bot - Telegram relay fork
-      Version: %s , Commit: %s
+      SaveAny-Bot
+      Version: %s, Commit: %s
 
       Commands:
       /start - Start using the bot
@@ -29,18 +29,22 @@ bot:
       /silent - Toggle silent mode
       /storage - Set default storage
       /save [custom filename] - Save file
-      /import <storage_name> <dir_path> [channel_id] [filter] - Import files from storage to Telegram
+      /dl <url> ... - Download files from links
+      /aria2dl <url> ... - Download files using Aria2
+      /ytdlp <url> ... - Download video or audio using yt-dlp
+      /transfer <storage:path> [regex] - Transfer files between storages
       /dir - Manage storage directories
       /rule - Manage rules
       /config - Modify configuration
       /fnametmpl - Set custom filename template
       /parser - Manage parser plugins
       /task - Manage task queue
+      /cancel <task_id> - Cancel a task
       /watch - Watch chats and auto save (UserBot)
       /unwatch - Stop watching chats (UserBot)
       /lswatch - List watched chats (UserBot)
       /syncpeers - Sync peer chats (UserBot)
-      /update - Check releases of this fork
+      /update - Check for updates
 
       Usage guide: https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md
     cmd:
