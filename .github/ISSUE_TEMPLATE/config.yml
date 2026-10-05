@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
-  - name: 📄 中文使用文档
+  - name: 📄 使用文档
     url: https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md
     about: "查看支持的功能、使用说明、配置与部署方法"

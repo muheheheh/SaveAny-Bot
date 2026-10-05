@@ -5,7 +5,7 @@ weight: 10
 
 # 使用说明
 
-SaveAny-Bot 可以将 Telegram 媒体回传到指定聊天，也可以将 Telegram 或网站上的文件保存到其他存储。完整功能列表见 [中文首页](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md#支持的功能)。
+SaveAny-Bot 可以将 Telegram 媒体回传到指定聊天，也可以将 Telegram 或网站上的文件保存到其他存储。完整功能列表见 [项目首页](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md#支持的功能)。
 
 ## 首次使用
 

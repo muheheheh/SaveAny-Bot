@@ -1,6 +1,6 @@
 # HTTP API 使用说明
 
-完整接口文档统一维护在 [中文 HTTP API 文档](./content/zh/usage/api.md)，包括配置、鉴权、请求参数、响应示例、错误码、进度和 Webhook 回调。本页保留为原接口文档链接的入口。
+配置、鉴权、请求参数、响应示例、错误码、进度和 Webhook 回调详见 [接口文档](./content/zh/usage/api.md)。
 
 ## 功能概览
 

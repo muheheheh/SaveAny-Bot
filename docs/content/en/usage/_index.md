@@ -5,7 +5,7 @@ weight: 10
 
 # Usage
 
-SaveAny-Bot can relay Telegram media to a configured chat or save Telegram and website files to other storage. The [repository homepage](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md) provides the complete feature overview in Chinese.
+SaveAny-Bot can relay Telegram media to a configured chat or save Telegram and website files to other storage. The [repository homepage](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md) provides the complete feature overview.
 
 ## First use
 

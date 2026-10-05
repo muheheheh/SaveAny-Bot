@@ -1,4 +1,4 @@
-# SaveAny-Bot（Telegram 快速回传）
+# SaveAny-Bot
 
 一个支持 Telegram 媒体回传、网站下载和多存储转存的机器人。本仓库基于 [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot) 维护，新增了 **Telegram 媒体直接回传**：复用已有媒体引用返回图片、视频、文档和相册，服务器无需下载或重新上传媒体文件。
 
@@ -121,7 +121,7 @@ docker compose up -d --build
 
 `/update` 和命令行更新器 `./saveany-bot up` 检查本仓库的 Release；在本仓库发布 Release 前，请通过源码更新。Docker 部署通过重新构建并重建容器更新。
 
-## 中文文档
+## 文档
 
 - [安装与更新](./docs/content/zh/deployment/installation.md)
 - [小内存 VPS 部署、更新与回滚](./deploy/vps/README.md)

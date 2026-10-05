@@ -2,7 +2,7 @@
 title: 介绍
 ---
 
-# SaveAny-Bot（Telegram 快速回传分支）
+# SaveAny-Bot
 
 [muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot) 基于原项目增加了 Telegram 媒体快速回传。
 
@@ -13,7 +13,7 @@ title: 介绍
 
 从 [安装与更新](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/installation.md) 开始，或查看 [Telegram 存储配置](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/configuration/storages.md#telegram)。本分支文档以本仓库为准。
 
-## 中文文档入口
+## 文档
 
 - [支持的功能与快速开始](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md)
 - [使用说明、常用命令与问题排查](./usage/_index.md)

@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        提交前请先查看中文使用文档和已有问题，确认是否已有解决方法。
+        提交前请先查看使用文档和已有问题，确认是否已有解决方法。
         配置和日志中请隐藏 Bot Token、密码、会话等敏感内容。
   - type: textarea
     attributes:
