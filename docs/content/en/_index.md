@@ -13,10 +13,9 @@ SaveAny-Bot supports Telegram media relay, website downloads, and transfers to m
 
 ## Documentation
 
-- [Supported features and quick start](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md)
+- [Supported features](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md#支持的功能)
 - [Usage](./usage/_index.md)
-- [Installation and updates](./deployment/installation.md)
-- [VPS deployment](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)
+- [Docker deployment](./deployment/installation.md)
 - [Configuration](./deployment/configuration/_index.md)
 - [Storage configuration](./deployment/configuration/storages.md)
 - [HTTP API](./usage/api.md) and [CLI](./usage/cli.md)

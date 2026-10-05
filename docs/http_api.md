@@ -19,7 +19,7 @@
 
 API 默认关闭。在 `config.toml` 的 `[api]` 中配置 `enable`、`host`、`port` 和 `token`。启用后，请求使用 `Authorization: Bearer <token>` 进行鉴权；Token 留空时不会执行鉴权。
 
-个人快速回传的 VPS 模板默认关闭 API，并且不发布端口。需要外部调用时，按 [完整说明](./content/zh/usage/api.md) 配置监听地址和容器网络。
+需要外部调用时，按 [完整说明](./content/zh/usage/api.md) 配置监听地址和容器网络。
 
 ## 任务记录与回调
 

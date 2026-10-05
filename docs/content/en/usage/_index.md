@@ -9,7 +9,7 @@ SaveAny-Bot can relay Telegram media to a configured chat or save Telegram and w
 
 ## First use
 
-1. Follow [installation](../deployment/installation.md). For personal media relay, use `deploy/vps/config.example.toml` from this repository.
+1. Follow [Docker deployment](../deployment/installation.md) using the `config.docker.example.toml` template.
 2. Set the bot token, use your numeric user ID for both the Telegram storage's `chat_id` and the allowed user's `id`, and enable `reuse_media = true` on that storage.
 3. Open a private chat with the bot and press **Start** or send `/start`.
 4. Send `/storage` and select the relay storage named “回传到聊天” as the default.

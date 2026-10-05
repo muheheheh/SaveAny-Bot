@@ -2,7 +2,7 @@
 
 支持 Telegram 媒体回传、网站下载和多存储转存的机器人。Telegram 媒体可通过已有引用直接发送，无需服务器下载或重新上传。
 
-[使用说明](./docs/content/zh/usage/_index.md) · [VPS 部署](./deploy/vps/README.md) · [配置说明](./docs/content/zh/deployment/configuration/_index.md) · [反馈问题](https://github.com/muheheheh/SaveAny-Bot/issues)
+[使用说明](./docs/content/zh/usage/_index.md) · [Docker 部署](./docs/content/zh/deployment/installation.md) · [配置说明](./docs/content/zh/deployment/configuration/_index.md) · [反馈问题](https://github.com/muheheheh/SaveAny-Bot/issues)
 
 ## 支持的功能
 
@@ -38,12 +38,11 @@
 
 机器人仍需在服务器保存配置、会话和用户设置等运行数据。纯文本聊天记录、投票等不属于媒体回传范围；受访问权限或内容保护限制的消息不保证可处理。
 
-## 快速开始
+## Docker 部署
 
 ### 1. 准备环境
 
-- 一台能连接 Telegram 的服务器。
-- Docker 和 Docker Compose；小内存 VPS 可按 [VPS 部署说明](./deploy/vps/README.md) 在本地编译后上传。
+- 一台能连接 Telegram 的 Linux 主机，已安装 Docker 和 Docker Compose。
 - 在 Telegram 的 `@BotFather` 创建机器人，取得 Bot Token。
 - 准备自己的 Telegram **数字用户 ID**，它与用户名、手机号和机器人 ID 不同。
 
@@ -52,7 +51,7 @@
 ```sh
 git clone https://github.com/muheheheh/SaveAny-Bot.git
 cd SaveAny-Bot
-cp deploy/vps/config.example.toml config.toml
+cp config.docker.example.toml config.toml
 chmod 600 config.toml
 ```
 
@@ -108,23 +107,20 @@ docker compose logs --tail=100 -f
 | `/parser` | 查看解析器信息 |
 | `/watch`、`/unwatch`、`/lswatch` | 管理聊天监听，需要配置 UserBot |
 
-## 部署与更新
+## 更新
 
-从源码构建的 Docker 部署可在源码目录执行：
+在项目目录执行：
 
 ```sh
 git pull --ff-only
 docker compose up -d --build
 ```
 
-小内存 VPS 使用 [本地编译后部署](./deploy/vps/README.md) 的更新步骤。更新前保留配置、`data` 目录和当前使用的程序或镜像。
-
-`/update` 和 `./saveany-bot up` 需要可用的 GitHub Release。Docker 部署使用上述重建步骤更新。
+配置和数据保存在挂载目录中，更新容器时会继续使用。
 
 ## 文档
 
-- [安装与更新](./docs/content/zh/deployment/installation.md)
-- [VPS 部署](./deploy/vps/README.md)
+- [Docker 部署](./docs/content/zh/deployment/installation.md)
 - [使用说明](./docs/content/zh/usage/_index.md)
 - [配置说明](./docs/content/zh/deployment/configuration/_index.md)
 - [存储配置](./docs/content/zh/deployment/configuration/storages.md)

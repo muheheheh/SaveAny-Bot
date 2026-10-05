@@ -1,142 +1,83 @@
 ---
-title: "安装与更新"
+title: "Docker 部署"
 ---
 
-# 安装与更新
+# Docker 部署
 
-## 源码构建
+需要一台已安装 Docker 和 Docker Compose 的 Linux 主机，并能连接 Telegram。
 
-安装 Go 1.25 或更新版本，然后从本仓库构建：
+## 1. 下载代码
 
 ```sh
 git clone https://github.com/muheheheh/SaveAny-Bot.git
 cd SaveAny-Bot
-CGO_ENABLED=0 go build -trimpath -o saveany-bot .
+cp config.docker.example.toml config.toml
+chmod 600 config.toml
 ```
 
-复制仓库内的 `deploy/vps/config.example.toml` 为 `config.toml`，填写 Bot Token、目标聊天 ID 和允许使用的用户 ID。模板默认启用快速回传。更多选项见 [配置说明](./configuration/_index.md)。
+## 2. 配置机器人
 
-运行:
+编辑 `config.toml`：
 
-```bash
-chmod +x saveany-bot
-./saveany-bot
-```
+| 配置项 | 内容 |
+| --- | --- |
+| `[telegram].token` | BotFather 提供的 Bot Token |
+| `[[storages]].chat_id` | 接收回传媒体的 Telegram 数字用户 ID |
+| `[[users]].id` | 允许使用机器人的 Telegram 数字用户 ID，与上面填写相同值 |
 
-### 进程守护
+模板已开启 `reuse_media = true`，默认将媒体回传到你与机器人的私聊。其他存储和参数见 [配置说明](./configuration/_index.md)。
 
-{{< tabs "daemon" >}}
-{{< tab "systemd (常规 Linux)" >}}
+## 3. 启动
 
-创建文件 <code>/etc/systemd/system/saveany-bot.service</code> 并写入以下内容:
-
-{{< codeblock >}}
-[Unit]
-Description=SaveAnyBot
-After=systemd-user-sessions.service
-
-[Service]
-Type=simple
-WorkingDirectory=/yourpath/
-ExecStart=/yourpath/saveany-bot
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-{{< /codeblock >}}
-
-设为开机启动并启动服务:
-
-{{< codeblock >}}
-systemctl enable --now saveany-bot
-{{< /codeblock >}}
-
-{{< /tab >}}
-
-{{< tab "procd (OpenWrt)" >}}
-
-<h4>添加开机自启动服务</h4>
-
-创建文件 <code>/etc/init.d/saveanybot</code> ，参考 <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> 并自行修改:
-
-{{< codeblock >}}
-#!/bin/sh /etc/rc.common
-
-#This is the OpenWRT init.d script for SaveAnyBot
-
-START=99 
-STOP=10
-description="SaveAnyBot"
-
-WORKING_DIR="/mnt/mmc1-1/SaveAnyBot"
-EXEC_PATH="$WORKING_DIR/saveany-bot"
-start() {
-    echo "Starting SaveAnyBot..."
-    cd $WORKING_DIR
-    $EXEC_PATH &
-}
-stop() {
-    echo "Stopping SaveAnyBot..."
-    killall saveany-bot
-}
-reload() {
-    stop
-    start
-}
-
-{{< /codeblock >}}
-
-赋予权限:
-
-{{< codeblock >}}
-chmod +x /etc/init.d/saveanybot
-{{< /codeblock >}}
-
-然后将文件复制到 <code>/etc/rc.d</code> 并重命名为 <code>S99saveanybot</code>, 同样赋予权限:
-
-{{< codeblock >}}
-chmod +x /etc/rc.d/S99saveanybot
-{{< /codeblock >}}
-
-<h4>添加快捷指令</h4>
-
-创建文件 <code>/usr/bin/sabot</code> ，参考 <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a>  并自行修改，注意此处文件编码仅支持 ANSI 936 .
-
-随后赋予权限:
-
-{{< codeblock >}}
-chmod +x /usr/bin/sabot
-{{< /codeblock >}}
-
-使用: <code>sudo sabot start|stop|restart|status|enable|disable</code>
-
-{{< /tab >}}
-{{< /tabs >}}
-
-
-## 使用 Docker 部署
-
-在本仓库的完整源码目录中，按上文准备好 `config.toml` 后运行：
+在项目根目录执行：
 
 ```sh
 docker compose up -d --build
 ```
 
-根目录的 Compose 文件会从源码构建镜像。
-小内存 VPS 可参考 [本地编译后部署](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)，在开发机器编译后上传。
+Docker 会构建镜像并启动容器，运行镜像包含 FFmpeg 和 yt-dlp。
 
-如需精简版本，可使用 `Dockerfile.micro` 或 `Dockerfile.pico` 构建。各版本的依赖和构建标签见对应 Dockerfile。
+查看状态和日志：
+
+```sh
+docker compose ps
+docker compose logs --tail=100 -f
+```
+
+按 `Ctrl+C` 退出日志查看，容器继续运行。
+
+打开机器人私聊，发送 `/start`，通过 `/storage` 选择“回传到聊天”，再用 `/silent` 开启自动处理。详细操作见 [使用说明](../usage/_index.md)。
+
+## 常用操作
+
+| 操作 | 命令 |
+| --- | --- |
+| 查看状态 | `docker compose ps` |
+| 查看日志 | `docker compose logs --tail=100 -f` |
+| 重启 | `docker compose restart` |
+| 停止 | `docker compose stop` |
+| 启动已停止的容器 | `docker compose start` |
+
+## 数据目录
+
+配置和数据通过项目目录挂载到容器：
+
+| 文件或目录 | 用途 |
+| --- | --- |
+| `config.toml` | 机器人、用户和存储配置 |
+| `data/` | 会话、数据库和用户设置 |
+| `downloads/` | 本地存储的默认保存目录 |
+| `cache/` | 下载任务的临时目录 |
+
+Telegram 媒体回传使用已有媒体引用，不写入媒体缓存。网站下载和其他存储任务按各自流程处理文件。
 
 ## 更新
 
-拉取更新后，重新构建并重建容器：
+在项目根目录执行：
 
 ```sh
 git pull --ff-only
 docker compose up -d --build
 ```
 
-如果使用本地编译后部署的 VPS 模板，请重新编译、上传二进制，再在服务器部署目录运行 `docker compose up -d --build`。
-
-原生二进制部署则重新运行上面的 Go 编译命令，替换可执行文件并重启服务。
-`/update` 和 `./saveany-bot up` 需要可用的 GitHub Release。Docker 部署使用上述重建步骤更新。
+配置和数据保存在挂载目录中，更新容器时会继续使用。修改 `config.toml` 后，执行 `docker compose restart` 使配置生效。

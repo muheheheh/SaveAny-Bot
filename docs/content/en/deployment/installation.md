@@ -1,142 +1,83 @@
 ---
-title: "Installation and Updates"
+title: "Docker Deployment"
 ---
 
-# Installation and Updates
+# Docker Deployment
 
-## Build from source
+Use a Linux host with Docker and Docker Compose installed and network access to Telegram.
 
-Install Go 1.25 or newer, then build from this repository:
+## 1. Download the source
 
 ```sh
 git clone https://github.com/muheheheh/SaveAny-Bot.git
 cd SaveAny-Bot
-CGO_ENABLED=0 go build -trimpath -o saveany-bot .
+cp config.docker.example.toml config.toml
+chmod 600 config.toml
 ```
 
-Copy `deploy/vps/config.example.toml` to `config.toml`, then fill in the bot token, destination chat ID, and allowed user ID. The template enables media reuse. See the [Configuration Guide](./configuration/_index.md) for other settings.
+## 2. Configure the bot
 
-Run:
+Edit `config.toml`:
 
-```bash
-chmod +x saveany-bot
-./saveany-bot
-```
+| Setting | Value |
+| --- | --- |
+| `[telegram].token` | The bot token provided by BotFather |
+| `[[storages]].chat_id` | Your numeric Telegram user ID, which receives relayed media |
+| `[[users]].id` | The same numeric user ID, authorized to use the bot |
 
-### Daemon
+The template enables `reuse_media = true` and sends media to your private chat with the bot. See [configuration](./configuration/_index.md) for other storage backends and settings.
 
-{{< tabs "daemon" >}}
-{{< tab "systemd (Regular Linux)" >}}
+## 3. Start
 
-Create a file <code>/etc/systemd/system/saveany-bot.service</code> and write the following content:
-
-{{< codeblock >}}
-[Unit]
-Description=SaveAnyBot
-After=systemd-user-sessions.service
-
-[Service]
-Type=simple
-WorkingDirectory=/yourpath/
-ExecStart=/yourpath/saveany-bot
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-{{< /codeblock >}}
-
-Enable startup on boot and start the service:
-
-{{< codeblock >}}
-systemctl enable --now saveany-bot
-{{< /codeblock >}}
-
-{{< /tab >}}
-
-{{< tab "procd (OpenWrt)" >}}
-
-<h4>Add Boot Autostart Service</h4>
-
-Create a file <code>/etc/init.d/saveanybot</code>, refer to <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> and modify as needed:
-
-{{< codeblock >}}
-#!/bin/sh /etc/rc.common
-
-#This is the OpenWRT init.d script for SaveAnyBot
-
-START=99 
-STOP=10
-description="SaveAnyBot"
-
-WORKING_DIR="/mnt/mmc1-1/SaveAnyBot"
-EXEC_PATH="$WORKING_DIR/saveany-bot"
-start() {
-    echo "Starting SaveAnyBot..."
-    cd $WORKING_DIR
-    $EXEC_PATH &
-}
-stop() {
-    echo "Stopping SaveAnyBot..."
-    killall saveany-bot
-}
-reload() {
-    stop
-    start
-}
-
-{{< /codeblock >}}
-
-Set permissions:
-
-{{< codeblock >}}
-chmod +x /etc/init.d/saveanybot
-{{< /codeblock >}}
-
-Then copy the file to <code>/etc/rc.d</code> and rename it to <code>S99saveanybot</code>, also set permissions:
-
-{{< codeblock >}}
-chmod +x /etc/rc.d/S99saveanybot
-{{< /codeblock >}}
-
-<h4>Add Shortcut Commands</h4>
-
-Create a file <code>/usr/bin/sabot</code>, refer to <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a> and modify as needed. Note that the file encoding here only supports ANSI 936.
-
-Then set permissions:
-
-{{< codeblock >}}
-chmod +x /usr/bin/sabot
-{{< /codeblock >}}
-
-Usage: <code>sudo sabot start|stop|restart|status|enable|disable</code>
-
-{{< /tab >}}
-{{< /tabs >}}
-
-
-## Deploy using Docker
-
-From a full checkout of this repository, prepare `config.toml` as above and run:
+Run from the repository root:
 
 ```sh
 docker compose up -d --build
 ```
 
-The root Compose file builds the image from source.
-For a small VPS, [build locally and deploy the binary](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md).
+Docker builds the image and starts the container. The runtime image includes FFmpeg and yt-dlp.
 
-Slim variants can be built using `Dockerfile.micro` or `Dockerfile.pico`. Check each Dockerfile for its dependencies and build tags.
+Check status and logs:
+
+```sh
+docker compose ps
+docker compose logs --tail=100 -f
+```
+
+Press `Ctrl+C` to stop following logs; the container keeps running.
+
+Open the bot's private chat, send `/start`, select the relay storage with `/storage`, then enable automatic processing with `/silent`. See [usage](../usage/_index.md) for details.
+
+## Common operations
+
+| Operation | Command |
+| --- | --- |
+| Show status | `docker compose ps` |
+| Follow logs | `docker compose logs --tail=100 -f` |
+| Restart | `docker compose restart` |
+| Stop | `docker compose stop` |
+| Start stopped containers | `docker compose start` |
+
+## Data directories
+
+Configuration and data are mounted from the project directory:
+
+| File or directory | Purpose |
+| --- | --- |
+| `config.toml` | Bot, user, and storage configuration |
+| `data/` | Sessions, database, and user settings |
+| `downloads/` | Default destination for local storage |
+| `cache/` | Temporary files for download tasks |
+
+Telegram media relay uses existing references without writing media cache files. Website downloads and other storage tasks use their respective transfer paths.
 
 ## Updates
 
-Pull updates, then rebuild and recreate the container:
+Run from the repository root:
 
 ```sh
 git pull --ff-only
 docker compose up -d --build
 ```
 
-For the VPS template, rebuild locally, upload the binary, and run `docker compose up -d --build` in the server deployment directory.
-
-For native binary deployments, repeat the Go build command, replace the executable, and restart the service.
-`/update` and `./saveany-bot up` require an available GitHub release. Update Docker deployments using the rebuild steps above.
+Configuration and data persist in the mounted directories and are reused by updated containers. After changing `config.toml`, run `docker compose restart` to apply it.

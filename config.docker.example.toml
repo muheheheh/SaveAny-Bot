@@ -1,4 +1,4 @@
-# 复制到 /opt/saveany-bot/config.toml，填写 Bot Token 和 Telegram 用户 ID 后启动。
+# 复制为项目根目录的 config.toml，填写 Bot Token 和 Telegram 用户 ID 后启动。
 # Telegram 媒体直接回传到指定私聊，不下载或缓存媒体文件。
 lang = "zh-Hans"
 workers = 1

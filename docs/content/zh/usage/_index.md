@@ -9,7 +9,7 @@ SaveAny-Bot 可以将 Telegram 媒体回传到指定聊天，也可以将 Telegr
 
 ## 首次使用
 
-1. 按 [安装说明](../deployment/installation.md) 部署机器人。个人快速回传可使用仓库内的 `deploy/vps/config.example.toml`。
+1. 按 [Docker 部署](../deployment/installation.md) 启动机器人，使用 `config.docker.example.toml` 配置模板。
 2. 在配置中填写 Bot Token，将 Telegram 存储的 `chat_id` 和允许用户的 `id` 都设为你自己的数字用户 ID，并开启该存储的 `reuse_media = true`。
 3. 打开机器人私聊，点击 **Start** 或发送 `/start`。
 4. 发送 `/storage`，选择“回传到聊天”作为默认存储。
