@@ -42,7 +42,7 @@ SaveAny-Bot 可以将 Telegram 媒体回传到指定聊天，也可以将 Telegr
 | `/cancel <任务ID>` | 取消指定任务，也可点击进度消息上的取消按钮 |
 | `/help` | 查看机器人帮助 |
 
-开启静默模式后，支持的媒体和链接会按默认存储及已配置的规则处理。发送网站链接会进入网站解析或下载流程，不能因为开启静默模式就免于下载。
+开启静默模式后，支持的媒体和链接会按默认存储及已配置的规则处理。网站链接使用对应的解析器或下载器。
 
 ## 其他支持的功能
 
@@ -81,4 +81,4 @@ SaveAny-Bot 可以将 Telegram 媒体回传到指定聊天，也可以将 Telegr
 | 引用发送失败 | 查看错误和日志；确认源媒体仍可访问后重新提交。此模式不会自动下载重试 |
 | 服务器出现缓存文件 | 检查任务是否来自网站、使用其他存储，或选中了未开启 `reuse_media` 的 Telegram 存储 |
 
-更多配置见 [配置说明](../deployment/configuration/_index.md)。需要反馈问题时，请在 [本仓库的问题页面](https://github.com/muheheheh/SaveAny-Bot/issues) 提供复现步骤和已隐藏 Token 等敏感内容的日志。
+更多配置见 [配置说明](../deployment/configuration/_index.md)。反馈问题时，请在 [Issues](https://github.com/muheheheh/SaveAny-Bot/issues) 提供复现步骤和已隐藏 Token 等敏感内容的日志。

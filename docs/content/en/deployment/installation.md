@@ -4,7 +4,7 @@ title: "Installation and Updates"
 
 # Installation and Updates
 
-## Build this fork from source
+## Build from source
 
 Install Go 1.25 or newer, then build from this repository:
 
@@ -14,9 +14,7 @@ cd SaveAny-Bot
 CGO_ENABLED=0 go build -trimpath -o saveany-bot .
 ```
 
-Build from source until this fork publishes releases. Upstream release binaries do not include this fork's relay changes.
-
-Copy `deploy/vps/config.example.toml` to `config.toml`, then fill in the bot token, destination chat ID, and allowed user ID. The template enables media reuse. See the [Configuration Guide](../configuration) for other settings.
+Copy `deploy/vps/config.example.toml` to `config.toml`, then fill in the bot token, destination chat ID, and allowed user ID. The template enables media reuse. See the [Configuration Guide](./configuration/_index.md) for other settings.
 
 Run:
 
@@ -124,14 +122,14 @@ From a full checkout of this repository, prepare `config.toml` as above and run:
 docker compose up -d --build
 ```
 
-The root Compose file builds this fork instead of pulling the upstream application image.
+The root Compose file builds the image from source.
 For a small VPS, [build locally and deploy the binary](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md).
 
-Slim variants can be built from this fork's `Dockerfile.micro` or `Dockerfile.pico`. Choose the variant according to the dependencies and build tags in its Dockerfile.
+Slim variants can be built using `Dockerfile.micro` or `Dockerfile.pico`. Check each Dockerfile for its dependencies and build tags.
 
 ## Updates
 
-Pull this fork, then rebuild and recreate the container:
+Pull updates, then rebuild and recreate the container:
 
 ```sh
 git pull --ff-only
@@ -141,4 +139,4 @@ docker compose up -d --build
 For the VPS template, rebuild locally, upload the binary, and run `docker compose up -d --build` in the server deployment directory.
 
 For native binary deployments, repeat the Go build command, replace the executable, and restart the service.
-`/update` and `./saveany-bot up` only query this fork's GitHub releases and cannot update until releases are published here. Docker deployments are updated by rebuilding their images.
+`/update` and `./saveany-bot up` require an available GitHub release. Update Docker deployments using the rebuild steps above.

@@ -1,6 +1,6 @@
 # SaveAny-Bot
 
-一个支持 Telegram 媒体回传、网站下载和多存储转存的机器人。本仓库基于 [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot) 维护，新增了 **Telegram 媒体直接回传**：复用已有媒体引用返回图片、视频、文档和相册，服务器无需下载或重新上传媒体文件。
+支持 Telegram 媒体回传、网站下载和多存储转存的机器人。Telegram 媒体可通过已有引用直接发送，无需服务器下载或重新上传。
 
 [使用说明](./docs/content/zh/usage/_index.md) · [VPS 部署](./deploy/vps/README.md) · [配置说明](./docs/content/zh/deployment/configuration/_index.md) · [反馈问题](https://github.com/muheheheh/SaveAny-Bot/issues)
 
@@ -26,7 +26,7 @@
 
 网站解析取决于对应解析器、登录状态和目标网站的可访问性；yt-dlp、Aria2、Rclone 等功能需要相应工具或服务。
 
-## 文件会不会保存在服务器
+## 文件处理
 
 | 使用场景 | 文件处理方式 |
 | --- | --- |
@@ -77,7 +77,7 @@ docker compose up -d --build
 docker compose logs --tail=100 -f
 ```
 
-退出日志查看可按 `Ctrl+C`，容器会继续运行。该命令从本仓库构建程序；原项目的预编译程序不包含本分支新增的快速回传功能。
+按 `Ctrl+C` 退出日志查看，容器会继续运行。
 
 ### 4. 在 Telegram 中使用
 
@@ -119,15 +119,15 @@ docker compose up -d --build
 
 小内存 VPS 使用 [本地编译后部署](./deploy/vps/README.md) 的更新步骤。更新前保留配置、`data` 目录和当前使用的程序或镜像。
 
-`/update` 和命令行更新器 `./saveany-bot up` 检查本仓库的 Release；在本仓库发布 Release 前，请通过源码更新。Docker 部署通过重新构建并重建容器更新。
+`/update` 和 `./saveany-bot up` 需要可用的 GitHub Release。Docker 部署使用上述重建步骤更新。
 
 ## 文档
 
 - [安装与更新](./docs/content/zh/deployment/installation.md)
-- [小内存 VPS 部署、更新与回滚](./deploy/vps/README.md)
-- [使用说明与功能入口](./docs/content/zh/usage/_index.md)
-- [完整配置说明](./docs/content/zh/deployment/configuration/_index.md)
-- [存储端与 Telegram 快速回传配置](./docs/content/zh/deployment/configuration/storages.md)
+- [VPS 部署](./deploy/vps/README.md)
+- [使用说明](./docs/content/zh/usage/_index.md)
+- [配置说明](./docs/content/zh/deployment/configuration/_index.md)
+- [存储配置](./docs/content/zh/deployment/configuration/storages.md)
 - [存储规则](./docs/content/zh/usage/rules.md) · [存储间传输](./docs/content/zh/usage/transfer.md)
 - [HTTP API](./docs/content/zh/usage/api.md) · [命令行使用](./docs/content/zh/usage/cli.md)
 - [解析器插件开发](./plugins/README.md)
@@ -135,7 +135,5 @@ docker compose up -d --build
 ## 来源与许可证
 
 本项目基于 [krau](https://github.com/krau) 和 [上游贡献者](https://github.com/krau/SaveAny-Bot/graphs/contributors) 开发的 SaveAny-Bot，保留 [AGPL-3.0 许可证](./LICENSE) 及原有版权声明。
-
-Go 模块名和导入路径保留 `github.com/krau/SaveAny-Bot` 以维持源码兼容，部署和更新来源为 [muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot)。
 
 感谢 [gotd](https://github.com/gotd/td)、[gotgproto](https://github.com/celestix/gotgproto)、[TG-FileStreamBot](https://github.com/EverythingSuckz/TG-FileStreamBot)、[tdl](https://github.com/iyear/tdl) 及所有上游依赖和贡献者。

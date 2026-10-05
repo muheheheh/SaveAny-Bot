@@ -3,7 +3,7 @@
 [项目说明](./README.md)
 
 - [支持的功能](./README.md#支持的功能)
-- [文件处理方式](./README.md#文件会不会保存在服务器)
+- [文件处理](./README.md#文件处理)
 - [快速开始](./README.md#快速开始)
 - [使用说明](./docs/content/zh/usage/_index.md)
 - [VPS 部署说明](./deploy/vps/README.md)

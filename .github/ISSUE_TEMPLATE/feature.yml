@@ -3,11 +3,6 @@ description: "提出新功能或现有功能的改进建议"
 labels:
   - "enhancement"
 body:
-  - type: markdown
-    attributes:
-      value: |
-        本分支支持 Telegram 媒体快速回传，并保留多存储、网站下载和解析器等功能。
-        请先阅读项目首页的功能说明，再描述你的使用场景和期望效果。
   - type: textarea
     attributes:
       label: "⭐️ 功能描述"

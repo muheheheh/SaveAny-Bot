@@ -42,7 +42,7 @@ Message links, historical ranges, and private chats require access to the source
 | `/cancel <task-ID>` | Cancel a task; progress messages also provide a cancel button |
 | `/help` | Show bot help |
 
-With silent mode enabled, supported media and links use the default storage and configured rules. Website links still use website parsing or downloading; silent mode does not make them download-free.
+With silent mode enabled, supported media and links use the default storage and configured rules. Website links use the corresponding parser or downloader.
 
 ## Other supported features
 
@@ -81,4 +81,4 @@ With silent mode enabled, supported media and links use the default storage and 
 | Reference sending fails | Inspect the error and logs, confirm source access, then resubmit. Relay does not fall back to downloading |
 | Files appear in the cache | Check for website tasks, other storage, or Telegram storage without `reuse_media` enabled |
 
-See [configuration](../deployment/configuration/_index.md) for more options. Report reproducible problems in [this fork's issues](https://github.com/muheheheh/SaveAny-Bot/issues), removing tokens and other secrets from logs first.
+See [configuration](../deployment/configuration/_index.md) for more options. Report reproducible problems in [Issues](https://github.com/muheheheh/SaveAny-Bot/issues), removing tokens and other secrets from logs first.

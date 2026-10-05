@@ -7,8 +7,6 @@ weight: 3
 
 Storage rules allow you to define redirection rules when the bot uploads files to storage, so that saved files are automatically organized.
 
-Upstream implementation reference: <a href="https://github.com/krau/SaveAny-Bot/issues/28" target="_blank">#28</a>
-
 Currently supported rule types:
 
 1. FILENAME-REGEX
@@ -86,7 +84,7 @@ Similar to the above, but matches based on the text content of the message itsel
 
 Matches album messages (media groups). Rule content can only be `true` or `false`.
 
-If the path in the rule uses `NEW-FOR-ALBUM`, the bot will create a new folder for each media group and store all files of that group there. Upstream implementation reference: https://github.com/krau/SaveAny-Bot/issues/87
+If the path in the rule uses `NEW-FOR-ALBUM`, the bot will create a new folder for each media group and store all files of that group there.
 
 For example:
 

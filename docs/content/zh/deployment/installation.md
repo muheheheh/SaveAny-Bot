@@ -4,7 +4,7 @@ title: "安装与更新"
 
 # 安装与更新
 
-## 从本分支源码构建
+## 源码构建
 
 安装 Go 1.25 或更新版本，然后从本仓库构建：
 
@@ -14,9 +14,7 @@ cd SaveAny-Bot
 CGO_ENABLED=0 go build -trimpath -o saveany-bot .
 ```
 
-本分支发布 Release 前，以源码构建为准。原作者的发布文件不包含本分支新增的快速回传功能。
-
-复制仓库内的 `deploy/vps/config.example.toml` 为 `config.toml`，填写 Bot Token、目标聊天 ID 和允许使用的用户 ID。模板默认启用快速回传。更多选项见 [配置说明](../configuration)。
+复制仓库内的 `deploy/vps/config.example.toml` 为 `config.toml`，填写 Bot Token、目标聊天 ID 和允许使用的用户 ID。模板默认启用快速回传。更多选项见 [配置说明](./configuration/_index.md)。
 
 运行:
 
@@ -124,14 +122,14 @@ chmod +x /usr/bin/sabot
 docker compose up -d --build
 ```
 
-根目录的 Compose 文件会从本分支构建镜像，不拉取上游应用镜像。
+根目录的 Compose 文件会从源码构建镜像。
 小内存 VPS 可参考 [本地编译后部署](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)，在开发机器编译后上传。
 
-如需精简版本，可从本分支的 `Dockerfile.micro` 或 `Dockerfile.pico` 构建，并根据所需功能选择变体。各变体的依赖和构建标签见对应 Dockerfile。
+如需精简版本，可使用 `Dockerfile.micro` 或 `Dockerfile.pico` 构建。各版本的依赖和构建标签见对应 Dockerfile。
 
 ## 更新
 
-从本分支拉取更新后，重新构建并重建容器：
+拉取更新后，重新构建并重建容器：
 
 ```sh
 git pull --ff-only
@@ -141,4 +139,4 @@ docker compose up -d --build
 如果使用本地编译后部署的 VPS 模板，请重新编译、上传二进制，再在服务器部署目录运行 `docker compose up -d --build`。
 
 原生二进制部署则重新运行上面的 Go 编译命令，替换可执行文件并重启服务。
-`/update` 和 `./saveany-bot up` 只查询本分支的 GitHub Release，尚未发布版本时无法通过它们更新；Docker 部署始终通过重新构建镜像更新。
+`/update` 和 `./saveany-bot up` 需要可用的 GitHub Release。Docker 部署使用上述重建步骤更新。

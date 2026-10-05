@@ -4,21 +4,21 @@ title: 介绍
 
 # SaveAny-Bot
 
-[muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot) 基于原项目增加了 Telegram 媒体快速回传。
+SaveAny-Bot 支持 Telegram 媒体回传、网站下载和多存储转存。
 
 - Telegram 存储启用 `reuse_media = true` 后，单文件和相册直接复用媒体引用发送，不下载或缓存媒体文件。
 - 相册顺序和原消息说明文字会保留，说明文字按纯文本发送。
 - 引用发送失败时直接报错，不自动下载重传。
-- 原有网站下载、存储后端、规则和解析器仍可使用，它们保持原有传输和缓存行为。
-
-从 [安装与更新](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/installation.md) 开始，或查看 [Telegram 存储配置](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/configuration/storages.md#telegram)。本分支文档以本仓库为准。
+- 网站下载及其他存储操作可能使用临时文件。
 
 ## 文档
 
 - [支持的功能与快速开始](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md)
-- [使用说明、常用命令与问题排查](./usage/_index.md)
-- [VPS 部署、更新与回滚](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)
+- [使用说明](./usage/_index.md)
+- [安装与更新](./deployment/installation.md)
+- [VPS 部署](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)
 - [配置说明](./deployment/configuration/_index.md)
+- [存储配置](./deployment/configuration/storages.md)
 - [HTTP API](./usage/api.md) 与 [命令行使用](./usage/cli.md)
 
 ## 来源与许可证

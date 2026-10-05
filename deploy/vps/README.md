@@ -54,7 +54,7 @@ docker compose logs --tail=100 -f
 
 按 `Ctrl+C` 退出日志查看，容器继续运行。Compose 已设置自动重启。
 
-该模板以固定版本的上游镜像提供 FFmpeg、yt-dlp 等运行依赖，再用本仓库编译的程序替换其中的可执行文件。快速回传功能来自上传的程序。
+运行镜像已包含 FFmpeg 和 yt-dlp。
 
 ## 4. 首次使用
 
@@ -83,8 +83,6 @@ docker compose logs --tail=100 -f
 2. 在服务器保存当前程序、Compose 文件、配置及 `data/` 的备份。
 3. 上传新的 `saveany-bot`；仅在模板有改动时同步构建文件，保留已填写的 `config.toml`。
 4. 在服务器的 `/opt/saveany-bot` 目录执行 `docker compose up -d --build`，并检查启动日志。
-
-Docker 部署通过重建镜像和容器更新。`/update` 查询本仓库的 Release，不能代替上述 Docker 更新步骤。
 
 ## 回滚
 
