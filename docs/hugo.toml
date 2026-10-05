@@ -1,5 +1,5 @@
 baseURL = '/'
-title = 'SaveAny-Bot · Telegram Relay Fork'
+title = 'SaveAny-Bot · Telegram 快速回传'
 disablePathToLower = true
 enableGitInfo = true
 defaultContentLanguage = 'zh'

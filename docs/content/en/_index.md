@@ -13,6 +13,16 @@ title: Introduction
 
 Start with [installation and updates](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/en/deployment/installation.md), or see [Telegram storage settings](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/en/deployment/configuration/storages.md#telegram). This repository contains the documentation for this fork.
 
+## Documentation
+
+The repository homepage and deployment guide are maintained in Chinese. This language section remains available as a supplementary translation.
+
+- [Supported features and quick start (Chinese)](https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md)
+- [Usage, commands, and troubleshooting](./usage/_index.md)
+- [VPS deployment, updates, and rollback (Chinese)](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)
+- [Configuration](./deployment/configuration/_index.md)
+- [HTTP API](./usage/api.md) and [CLI](./usage/cli.md)
+
 ## Origin and license
 
 Based on [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot), with thanks to the [upstream contributors](https://github.com/krau/SaveAny-Bot/graphs/contributors). The AGPL-3.0 license and upstream notices are retained.

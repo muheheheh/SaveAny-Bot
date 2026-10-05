@@ -1,8 +1,8 @@
-# SaveAnyBot Plugins
+# SaveAny-Bot 解析器插件开发
 
 SaveAnyBot 可通过插件扩展功能, 目前仅支持 Parser (解析器)插件.
 
-## Parser
+## 解析器接口
 
 解析器为 SaveAnyBot 提供了处理非 Telegram 文件的能力, 例如下载其他网站的图片或视频.
 
@@ -14,21 +14,21 @@ type Parser interface {
 	Parse(ctx context.Context, url string) (*Item, error) // 解析 URL, 返回 Item
 }
 
-// Resource is a single downloadable resource with metadata.
+// Resource 表示一个可下载资源及其元数据。
 type Resource struct {
 	URL       string            `json:"url"`
-	Filename  string            `json:"filename"` // with ext
+	Filename  string            `json:"filename"` // 包含扩展名
 	MimeType  string            `json:"mime_type"`
 	Extension string            `json:"extension"`
-	Size      int64             `json:"size"`    // 0 when unknown
+	Size      int64             `json:"size"`    // 未知时为 0
 	Hash      map[string]string `json:"hash"`    // {"md5": "...", "sha256": "..."}
-	Headers   map[string]string `json:"headers"` // HTTP headers when downloading
+	Headers   map[string]string `json:"headers"` // 下载时使用的 HTTP 请求头
 	Extra     map[string]any    `json:"extra"`
 }
 
 type Item struct {
 	Site        string         `json:"site"`
-	URL         string         `json:"url"` // original URL of the item
+	URL         string         `json:"url"` // 条目的原始链接
 	Title       string         `json:"title"`
 	Author      string         `json:"author"`
 	Description string         `json:"description"`
@@ -38,7 +38,7 @@ type Item struct {
 }
 ```
 
-### Write a Parser Plugin
+### 编写解析器插件
 
 解析器插件可使用 JavaScript 编写, SaveAnyBot 使用 [goja](https://github.com/dop251/goja) 提供运行时, 并向其中注入了以下全局函数或对象:
 
@@ -49,20 +49,20 @@ type Item struct {
 
 插件需要提供元数据 `metadata` 并实现 `canHandle` 和 `parse` 两个函数, 最后调用 `registerParser` 注册解析器.
 
-#### Plugin Metadata
+#### 插件元数据
 
 插件元数据是一个 JavaScript 对象:
 
 ```js
 const metadata = {
     version: "1.0.0", // 插件兼容版本号, 必须提供, 其他字段可选
-    name: "Example Parser", // 插件名称
-    description: "A parser for example links", // 插件描述
+    name: "示例解析器", // 插件名称
+    description: "解析示例网站链接", // 插件描述
     author: "Krau", // 插件作者
 }
 ```
 
-#### canHandle Function
+#### 判断是否支持链接：canHandle
 
 `canHandle`: `canHandle(url: string): boolean` , 用于判断当前解析器能否解析给定的 URL, 返回布尔值, 例如:
 
@@ -74,7 +74,7 @@ const canHandle = function (url) {
 
 这将让 SaveAnyBot 在遇到包含 `youtube.com/watch?v` 的 url 时调用当前解析器的 `parse`.
 
-#### parse Function
+#### 解析资源：parse
 
 `parse`: `parse(url: string): Item` , 是核心解析函数, 用于解析给定的 url, 返回一个 `Item` 对象, 例:
 
@@ -117,7 +117,7 @@ const parse = function (url) {
 }
 ```
 
-#### HTTP Requests
+#### HTTP 请求
 
 使用 `ghttp` 对象以发起 HTTP 请求.
 
@@ -143,7 +143,7 @@ if (response.status) {
 }
 ```
 
-#### Playwright
+#### Playwright 浏览器请求
 
 使用 `playwright` 对象以发起基于浏览器的请求.
 
@@ -168,7 +168,7 @@ registerParser({
 });
 ```
 
-### Examples
+### 示例插件
 
 请先查看 [example_parser_basic.js](./example_parser_basic.js) 了解最简示例解析器插件的实现.
 

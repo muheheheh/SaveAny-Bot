@@ -1,45 +1,38 @@
-name: "👾 Bug Report"
-description: "Report a bug or unexpected behavior"
+name: "👾 问题反馈"
+description: "报告功能异常或使用问题"
 labels:
   - "bug"
-assignees:
-  - krau
 body:
   - type: markdown
     attributes:
       value: |
-        # Please Search Before Submitting / 提交前请搜索
-        Please make sure to search existing issues before submitting a new bug report.  
-        提交新的 Bug 报告前请务必搜索已有的 issue，避免重复
+        提交前请先查看中文使用文档和已有问题，确认是否已有解决方法。
+        配置和日志中请隐藏 Bot Token、密码、会话等敏感内容。
   - type: textarea
     attributes:
-      label: "👾 Description"
-      description: "What happened?"
-      placeholder: "When called ... happens ..."
+      label: "👾 问题描述"
+      description: "发生了什么？请提供操作步骤、输入类型和实际结果。"
+      placeholder: "例如：开启快速回传后，转发一组相册时……"
     validations:
       required: true
   - type: textarea
     attributes:
-      label: "⚡️ Expected Behavior"
-      description: "What was expected?"
-      placeholder: "It should be ..."
+      label: "⚡️ 预期结果"
+      description: "你希望机器人如何处理？"
+      placeholder: "预期应该……"
   - type: textarea
     attributes:
-      label: "📄 Configuration File"
-      description: "Please provide your config file"
-      placeholder: "Please remove sensitive information"
+      label: "📄 相关配置"
+      description: "提供与问题有关的配置，注明目标存储及是否开启 reuse_media。"
+      placeholder: "粘贴前请删除 Token、密码等敏感信息"
       render: toml
     validations:
       required: true
   - type: textarea
     attributes:
-      label: "🔍 Logs"
-      description: "Please provide logs"
-      placeholder: "Please remove sensitive information"
+      label: "🔍 运行日志"
+      description: "提供出错时的日志，并注明部署方式和程序版本或提交编号。"
+      placeholder: "粘贴前请删除敏感信息"
       render: shell
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: |
-        ## Thank you for contributing to the project :slightly_smiling_face:
