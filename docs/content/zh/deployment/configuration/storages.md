@@ -77,7 +77,7 @@ https://s3.example.com/your_bucket_name/path/to/s3/your_file
 
 ```toml
 # Telegram 聊天 ID, Bot 将把文件发送到这个聊天
-chat_id = "123456789"
+chat_id = 123456789
 # 直接复用 Telegram 媒体引用回传，默认关闭
 reuse_media = false
 # 是否强制使用文件方式发送, 默认为 false

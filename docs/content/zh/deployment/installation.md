@@ -25,7 +25,7 @@ chmod 600 config.toml
 | `[[storages]].chat_id` | 接收回传媒体的 Telegram 数字用户 ID |
 | `[[users]].id` | 允许使用机器人的 Telegram 数字用户 ID，与上面填写相同值 |
 
-模板已开启 `reuse_media = true`，默认将媒体回传到你与机器人的私聊。其他存储和参数见 [配置说明](./configuration/_index.md)。
+模板已开启 `reuse_media = true`，默认将媒体回传到你与机器人的私聊。配置层级、完整回传示例和多用户配置见 [配置文件结构](./configuration/_index.md#配置文件结构)。
 
 ## 3. 启动
 

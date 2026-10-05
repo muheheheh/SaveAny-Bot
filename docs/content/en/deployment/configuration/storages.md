@@ -76,7 +76,7 @@ If you are using a third-party S3-compatible service, it usually uses path-style
 Stream mode is not supported.
 
 ```toml
-chat_id = "123456789" # Telegram chat ID, the bot will send files to this chat
+chat_id = 123456789 # Telegram chat ID, the bot will send files to this chat
 reuse_media = false # Reuse existing Telegram media references directly. Disabled by default.
 force_file = false # Force sending as file, default is false
 skip_large = false # Skip large files, default is false. If enabled, files exceeding Telegram's limit will not be uploaded.

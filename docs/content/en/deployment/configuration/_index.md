@@ -4,33 +4,113 @@ title: "Configuration Guide"
 
 # Configuration Guide
 
-SaveAnyBot uses the toml format for its configuration files. You can learn more about toml syntax on the [TOML official website](https://toml.io/).
+SaveAny-Bot uses a UTF-8 TOML configuration file. For Docker deployment, create `config.toml` in the repository root; the container reads it at `/app/config.toml` through the bind mount.
 
-SaveAnyBot needs to read a `config.toml` file in the working directory as its configuration file. If this file is missing, a default file will be created, and the bot will attempt to load configuration from environment variables.
+## Configuration structure
 
-Here is an example of a minimal configuration file:
+| Location | Contents |
+| --- | --- |
+| Global fields at the beginning of the file | `lang`, `workers`, `threads`, `retry`, `stream`, `proxy`, `no_clean_cache` |
+| `[telegram]` | Bot token, Telegram API credentials, and connection settings |
+| `[telegram.proxy]` | Proxy used for Telegram connections |
+| `[telegram.userbot]` | User account login and session settings |
+| `[log]` | Log level |
+| `[[storages]]` | One storage or relay destination; repeat for additional destinations |
+| `[[users]]` | One authorized user and their available storages; repeat for additional users |
+| `[api]` | HTTP API switch, listen address, and authentication token |
+| `[aria2]` | Aria2 RPC connection and downloaded file retention |
+| `[ytdlp]` | Video quality, format, and filename settings |
+| `[parser]` | JavaScript parser plugins and parser proxy settings |
+| `[parser.twitter]`, `[parser.kemono]` | Settings for the corresponding built-in parsers |
+| `[temp]` | Temporary download directory |
+| `[db]` | User settings database and bot session file paths |
+| `[cache]` | In-memory cache settings |
+| `[hook.exec]` | Commands run when tasks start, succeed, fail, or are cancelled |
+
+- `[name]` defines a configuration table; `[telegram.proxy]` defines the `proxy` subtable of `telegram`.
+- `[[name]]` adds an entry to an array of tables. Repeat `[[storages]]` or `[[users]]` for each additional storage or user.
+- Fields belong to the most recent table header. Blank lines and comments do not end a table. Put global fields before the first table header.
+- Quote strings; leave numbers and `true` / `false` unquoted. Text after `#` is a comment. See the [TOML documentation](https://toml.io/) for more syntax.
+
+## Telegram relay configuration
+
+Save the following complete relay configuration as `config.toml`. Fill in the token and replace both instances of `123456789` with your numeric Telegram user ID. The repository's [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) provides a template with the same structure.
 
 ```toml
-[telegram]
-token = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+lang = "en"
+workers = 1
+threads = 2
+stream = false
 
-[[users]]
-# telegram user id
-id = 777000
-blacklist = true
+[log]
+level = "info"
+
+[telegram]
+token = "YOUR_BOTFATHER_TOKEN"
+
+[api]
+enable = false
 
 [[storages]]
-name = "Local Storage"
-type = "local"
+name = "Relay to chat"
+type = "telegram"
 enable = true
-base_path = "./downloads"
+chat_id = 123456789
+force_file = false
+reuse_media = true
+
+[[users]]
+id = 123456789
+storages = ["Relay to chat"]
+blacklist = false
 ```
+
+| Setting | Type | Purpose |
+| --- | --- | --- |
+| `lang` | String | Bot message language; `"en"` selects English |
+| `workers` | Integer | Number of tasks executed concurrently |
+| `threads` | Integer | Threads used for regular downloads; direct relay does not download media |
+| `stream` | Boolean | Streaming for regular downloads; `reuse_media` controls direct relay |
+| `level` in `[log]` | String | Log level; this example uses `"info"` |
+| `token` in `[telegram]` | String | Bot token provided by BotFather |
+| `enable` in `[api]` | Boolean | Enables the HTTP API; leave `false` when using the bot through Telegram |
+| `name` in `[[storages]]` | String | Storage name, unique across all storages |
+| `type` in `[[storages]]` | String | Use `"telegram"` to relay to Telegram |
+| `enable` in `[[storages]]` | Boolean | Set to `true` to enable this storage |
+| `chat_id` in `[[storages]]` | Integer | Fixed relay destination; use your user ID to relay to your private chat |
+| `reuse_media` in `[[storages]]` | Boolean | Set to `true` to send existing Telegram media references directly |
+| `force_file` in `[[storages]]` | Boolean | Forces regular uploads to be sent as files; direct relay preserves the original media type |
+| `id` in `[[users]]` | Integer | Telegram user ID authorized to operate the bot |
+| `storages` in `[[users]]` | List of strings | References the storage names defined above; names must match |
+| `blacklist` in `[[users]]` | Boolean | `false` allows only listed storages; `true` excludes listed storages |
+
+`chat_id` determines who receives media; `users.id` determines who can use the bot. Use the same ID for both when relaying to yourself. Each storage has a fixed destination. To relay separately for multiple users, define a storage for each user and reference it in that user's `storages` list.
+
+For example, append the following to add user `987654321`:
+
+```toml
+[[storages]]
+name = "Second user"
+type = "telegram"
+enable = true
+chat_id = 987654321
+reuse_media = true
+
+[[users]]
+id = 987654321
+storages = ["Second user"]
+blacklist = false
+```
+
+After startup, each user selects their default storage with `/storage` and enables automatic processing with `/silent`. These preferences are stored in the database. A destination `chat_id` can also identify a group or channel where the bot has permission to send messages. See [Telegram storage configuration](./storages.md#telegram) for related settings.
+
+Unused optional configuration tables can be omitted. Run `docker compose restart` after editing `config.toml` to apply the changes.
 
 ## Detailed Configuration
 
 ### Global Configuration
 
-- `lang`: The language used by the Bot, default is `zh-CN` (Simplified Chinese). `en` is used for English.
+- `lang`: The language used by the Bot, default is `zh-Hans` (Simplified Chinese). `en` is used for English.
 - `stream`: Whether to enable Stream mode, default is `false`. When enabled, the Bot will stream files directly to storage endpoints (if supported), without downloading them locally.
 {{< hint warning >}}
 Stream mode is very useful for deployment environments with limited disk space, but it also has some drawbacks:
@@ -60,7 +140,6 @@ proxy = "socks5://127.0.0.1:7890"
 
 - `token`: Your Telegram Bot Token, which can be obtained by creating a Bot through [BotFather](https://t.me/botfather).
 - `app_id`, `app_hash`: Telegram API ID & Hash, obtained by creating an application at [Telegram API](https://my.telegram.org/apps). Default values will be used if not provided.
-- `flood_retry`: Number of retries for flood control, default is 5.
 - `rpc_retry`: Number of retries for RPC requests, default is 5.
 - `proxy`: Proxy configuration, optional.
   - `enable`: Whether to enable the proxy.
@@ -82,7 +161,6 @@ If you deploy with Docker, please run the container with `-it` for an interactiv
 token = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 app_id = 1025907
 app_hash = "452b0359b988148995f22ff0f4229750"
-flood_retry = 5
 rpc_retry = 5
 [telegram.proxy]
 enable = false
@@ -99,7 +177,7 @@ Aria2 is a powerful download manager that supports HTTP/HTTPS, FTP, BitTorrent, 
 - `enable`: Whether to enable Aria2 support, default is `false`
 - `url`: Aria2 RPC address, typically `http://localhost:6800/jsonrpc`
 - `secret`: Aria2 RPC secret, if you configured `rpc-secret` in Aria2, you need to fill it in here
-- `remove_after_transfer`: Whether to remove local files downloaded by Aria2 after transfer, default is `true`
+- `keep_file`: Whether to keep local files downloaded by Aria2 after transfer, default is `false`
 
 {{< hint info >}}
 Aria2 needs to be installed and running separately. You can refer to the [Aria2 official documentation](https://aria2.github.io/) to learn how to install and configure Aria2.
@@ -110,7 +188,7 @@ Aria2 needs to be installed and running separately. You can refer to the [Aria2 
 enable = true
 url = "http://localhost:6800/jsonrpc"
 secret = "your-rpc-secret"
-remove_after_transfer = true
+keep_file = false
 ```
 
 ### yt-dlp Configuration
@@ -143,7 +221,7 @@ When enabled, SaveAny-Bot exposes an HTTP API for creating/querying/canceling ta
 - `enable`: Whether to enable the HTTP API server, default is `false`.
 - `host`: Bind address, default `0.0.0.0`.
 - `port`: Listen port, default `8080`.
-- `token`: Authentication token. **Strongly recommended** — if empty, the API is exposed without any authentication.
+- `token`: Authentication token, required when the API is enabled.
 
 ```toml
 [api]
@@ -155,7 +233,7 @@ token = "your-token"
 
 ### Log Configuration
 
-- `level`: Log level. One of `debug`, `info`, `warn`, `error`, `fatal`. Default is `info`.
+- `level`: Log level. One of `debug`, `info`, `warn`, `error`, `fatal`. Default is `debug`; the relay template uses `info`.
 
 ```toml
 [log]
@@ -169,12 +247,13 @@ The storage endpoints list is used to define the storage locations supported by 
 Each storage endpoint requires at least the following fields:
 
 - `name`: Storage endpoint name, used for identification in the Bot, must be unique.
-- `enable`: Whether to enable this storage endpoint, default is `true`.
+- `enable`: Set to `true` to load this storage endpoint.
 - `type`: Storage endpoint type, currently supports the following types:
   - `local`: Local disk
   - `alist`: Alist
   - `webdav`: WebDAV
   - `s3`: aws S3 and other S3 compatible services
+  - `minio`: MinIO object storage
   - `rclone`: Uses rclone to implement uploads
   - `telegram`: Upload to Telegram
 
@@ -250,10 +329,10 @@ task_cancel = "bash /path/to/cancel_script.sh"
 
 ### Parsers
 
-Parsers give the bot the ability to handle non-Telegram files, such as downloading files from other websites. Configure them via `[parsers]`.
+Parsers give the bot the ability to handle non-Telegram files, such as downloading files from other websites. Configure them via `[parser]`.
 
 ```toml
-[parsers]
+[parser]
 plugin_enable = true # Whether to enable parser plugins
 plugin_dirs = ["./plugins"] # Plugin directories, can be multiple
 ```

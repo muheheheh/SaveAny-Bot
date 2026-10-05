@@ -4,33 +4,113 @@ title: "配置说明"
 
 # 配置说明
 
-SaveAnyBot 的配置文件使用 toml 格式, 你可以在 [TOML 官方网站](https://toml.io/) 上了解更多关于 toml 的语法.
+SaveAny-Bot 使用 UTF-8 编码的 TOML 配置文件。Docker 部署时，在项目根目录创建 `config.toml`，容器会读取挂载后的 `/app/config.toml`。
 
-SaveAnyBot 需要读取工作目录下的 `config.toml` 文件作为配置文件, 若缺少该文件则会创建默认文件, 并尝试从环境变量中加载配置.
+## 配置文件结构
 
-以下是一个最简的配置文件示例:
+| 位置 | 内容 |
+| --- | --- |
+| 文件开头的全局字段 | `lang`、`workers`、`threads`、`retry`、`stream`、`proxy`、`no_clean_cache` |
+| `[telegram]` | Bot Token、Telegram API 凭据和连接参数 |
+| `[telegram.proxy]` | Telegram 连接使用的代理 |
+| `[telegram.userbot]` | 用户账号登录及会话配置 |
+| `[log]` | 日志级别 |
+| `[[storages]]` | 一个存储或回传目标，可重复定义多个 |
+| `[[users]]` | 一个授权用户及其可用存储，可重复定义多个 |
+| `[api]` | HTTP API 开关、监听地址和认证 Token |
+| `[aria2]` | Aria2 RPC 连接及下载文件保留设置 |
+| `[ytdlp]` | 视频下载的清晰度、格式和文件名设置 |
+| `[parser]` | JavaScript 解析器插件及解析器代理设置 |
+| `[parser.twitter]`、`[parser.kemono]` | 对应内置解析器的设置 |
+| `[temp]` | 下载临时目录 |
+| `[db]` | 用户设置数据库和机器人会话文件路径 |
+| `[cache]` | 内存缓存参数 |
+| `[hook.exec]` | 任务开始、成功、失败或取消时执行的命令 |
+
+- `[名称]` 定义一组配置；`[telegram.proxy]` 表示 `telegram` 下的 `proxy` 子配置。
+- `[[名称]]` 定义列表中的一项。每增加一个存储或用户，都要再写一组 `[[storages]]` 或 `[[users]]`。
+- 字段属于它上方最近的配置组，空行和注释不会结束配置组。全局字段应写在第一个配置组之前。
+- 字符串加引号，数字和 `true` / `false` 不加引号；`#` 后是注释。更多语法见 [TOML 文档](https://toml.io/)。
+
+## Telegram 回传配置
+
+下面是可直接保存为 `config.toml` 的完整回传配置。填写 Token，并把两处 `123456789` 替换为自己的 Telegram 数字用户 ID。仓库中的 [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) 提供同一结构的模板。
 
 ```toml
-[telegram]
-token = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+lang = "zh-Hans"
+workers = 1
+threads = 2
+stream = false
 
-[[users]]
-# telegram user id
-id = 777000
-blacklist = true
+[log]
+level = "info"
+
+[telegram]
+token = "填入 BotFather 提供的 Token"
+
+[api]
+enable = false
 
 [[storages]]
-name = "本机存储"
-type = "local"
+name = "回传到聊天"
+type = "telegram"
 enable = true
-base_path = "./downloads"
+chat_id = 123456789
+force_file = false
+reuse_media = true
+
+[[users]]
+id = 123456789
+storages = ["回传到聊天"]
+blacklist = false
 ```
+
+| 配置项 | 类型 | 作用 |
+| --- | --- | --- |
+| `lang` | 字符串 | 机器人消息语言，`"zh-Hans"` 为简体中文 |
+| `workers` | 整数 | 同时执行的任务数量 |
+| `threads` | 整数 | 普通下载任务的线程数；直接回传不下载媒体 |
+| `stream` | 布尔值 | 普通下载任务是否使用流式传输；回传由 `reuse_media` 控制 |
+| `[log]` 中的 `level` | 字符串 | 日志级别，示例使用 `"info"` |
+| `[telegram]` 中的 `token` | 字符串 | BotFather 提供的机器人 Token |
+| `[api]` 中的 `enable` | 布尔值 | 是否启用 HTTP API；通过 Telegram 使用机器人时可保持 `false` |
+| `[[storages]]` 中的 `name` | 字符串 | 存储名称，在所有存储中唯一 |
+| `[[storages]]` 中的 `type` | 字符串 | 回传到 Telegram 时填写 `"telegram"` |
+| `[[storages]]` 中的 `enable` | 布尔值 | 设为 `true` 启用这个存储 |
+| `[[storages]]` 中的 `chat_id` | 整数 | 固定的回传目标；回传到自己的私聊时填写自己的用户 ID |
+| `[[storages]]` 中的 `reuse_media` | 布尔值 | 设为 `true` 复用 Telegram 媒体引用，直接回传 |
+| `[[storages]]` 中的 `force_file` | 布尔值 | 普通上传时是否强制作为文件发送；直接回传保留原媒体类型 |
+| `[[users]]` 中的 `id` | 整数 | 允许操作机器人的 Telegram 用户 ID |
+| `[[users]]` 中的 `storages` | 字符串列表 | 引用上面定义的存储名称，名称必须一致 |
+| `[[users]]` 中的 `blacklist` | 布尔值 | `false` 表示只允许使用列表中的存储；`true` 表示排除列表中的存储 |
+
+`chat_id` 决定媒体发给谁，`users.id` 决定谁能使用机器人。它们在回传给自己时填写相同值。一个存储的 `chat_id` 是固定目标，多个用户分别回传到自己时，应各自定义一个存储，并在各自的 `users.storages` 中引用。
+
+例如，新增用户 `987654321` 时，可在文件末尾追加：
+
+```toml
+[[storages]]
+name = "第二位用户"
+type = "telegram"
+enable = true
+chat_id = 987654321
+reuse_media = true
+
+[[users]]
+id = 987654321
+storages = ["第二位用户"]
+blacklist = false
+```
+
+启动后，每个用户通过 `/storage` 选择自己的默认存储，用 `/silent` 开启自动处理。这两个设置保存在数据库中。配置中的 `chat_id` 也可以是机器人有发送权限的群组或频道 ID；相关参数见 [Telegram 存储配置](./storages.md#telegram)。
+
+未使用的扩展配置组可以省略。修改 `config.toml` 后，执行 `docker compose restart` 使配置生效。
 
 ## 详细配置
 
 ### 全局配置
 
-- `lang`: Bot 使用的语言, 默认为 `zh-CN` (简体中文), 设为 `en` 则使用英语.
+- `lang`: Bot 使用的语言, 默认为 `zh-Hans` (简体中文), 设为 `en` 则使用英语.
 - `stream`: 是否启用 Stream 模式, 默认为 `false`. 启用后 Bot 将直接将文件流式传输到存储端(若存储端支持), 不需要下载到本地
 {{< hint warning >}}
 Stream 模式对于磁盘空间有限的部署环境十分有用, 但也有一些弊端:
@@ -48,7 +128,7 @@ Stream 模式对于磁盘空间有限的部署环境十分有用, 但也有一�
 - `proxy`: 全局代理配置, 配置后程序内一切网络连接将会尝试使用该代理, 可选.
 
 ```toml
-lang = "zh-CN"
+lang = "zh-Hans"
 stream = false
 workers = 3
 threads = 4
@@ -60,7 +140,6 @@ proxy = "socks5://127.0.0.1:7890"
 
 - `token`: 你的 Telegram Bot Token, 可以通过 [BotFather](https://t.me/botfather) 创建 Bot 并获取 Token.
 - `app_id`, `app_hash`: Telegram API ID & Hash, 在 [Telegram API](https://my.telegram.org/apps) 创建应用获取, 若不提供则使用默认值.
-- `flood_retry`: Flood 控制重试次数, 默认为 5.
 - `rpc_retry`: RPC 请求重试次数, 默认为 5.
 - `proxy`: 代理配置, 可选.
   - `enable`: 是否启用代理.
@@ -82,7 +161,6 @@ proxy = "socks5://127.0.0.1:7890"
 token = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 app_id = 1025907
 app_hash = "452b0359b988148995f22ff0f4229750"
-flood_retry = 5
 rpc_retry = 5
 [telegram.proxy]
 enable = false
@@ -99,7 +177,7 @@ Aria2 是一个强大的下载管理器，支持 HTTP/HTTPS、FTP、BitTorrent �
 - `enable`: 是否启用 Aria2 支持，默认为 `false`
 - `url`: Aria2 RPC 地址，通常为 `http://localhost:6800/jsonrpc`
 - `secret`: Aria2 RPC 密钥，如果你在 Aria2 中配置了 `rpc-secret`，需要在此填写
-- `remove_after_transfer`: 转存完成后是否删除 Aria2 下载的本地文件，默认为 `true`
+- `keep_file`: 转存完成后是否保留 Aria2 下载的本地文件，默认为 `false`
 
 {{< hint info >}}
 Aria2 需要单独安装和运行。你可以参考 [Aria2 官方文档](https://aria2.github.io/) 了解如何安装和配置 Aria2。
@@ -110,7 +188,7 @@ Aria2 需要单独安装和运行。你可以参考 [Aria2 官方文档](https:/
 enable = true
 url = "http://localhost:6800/jsonrpc"
 secret = "your-rpc-secret"
-remove_after_transfer = true
+keep_file = false
 ```
 
 ### yt-dlp 配置
@@ -143,7 +221,7 @@ restrict_filenames = false
 - `enable`: 是否启用 HTTP API 服务, 默认为 `false`.
 - `host`: 监听地址, 默认 `0.0.0.0`.
 - `port`: 监听端口, 默认 `8080`.
-- `token`: 鉴权 Token, **强烈建议设置** — 若为空, API 将在无任何鉴权的情况下暴露.
+- `token`: 鉴权 Token，启用 API 时必须填写。
 
 ```toml
 [api]
@@ -155,7 +233,7 @@ token = "your-token"
 
 ### 日志配置
 
-- `level`: 日志级别, 可选 `debug`, `info`, `warn`, `error`, `fatal`. 默认为 `info`.
+- `level`: 日志级别, 可选 `debug`, `info`, `warn`, `error`, `fatal`. 默认为 `debug`，回传模板设为 `info`.
 
 ```toml
 [log]
@@ -169,12 +247,13 @@ level = "info"
 每一个存储端至少需要以下字段:
 
 - `name`: 存储端名称, 用于在 Bot 中识别, 需要唯一
-- `enable`: 是否启用该存储端, 默认为 `true`
+- `enable`: 是否启用该存储端，设为 `true` 才会加载
 - `type`: 存储端类型, 目前支持以下类型:
   - `local`: 本地磁盘
   - `alist`: Alist
   - `webdav`: WebDAV
   - `s3`: aws S3 及其他兼容 S3 的服务
+  - `minio`: MinIO 对象存储
   - `rclone`: 调用 rclone 实现上传
   - `telegram`: 上传到 Telegram
 
@@ -250,10 +329,10 @@ task_cancel = "bash /path/to/cancel_script.sh"
 
 ### 解析器
 
-解析器为 Bot 提供了处理非 Telegram 文件的能力, 例如从其他网站下载文件. 使用 `[parsers]` 配置.
+解析器为 Bot 提供了处理非 Telegram 文件的能力, 例如从其他网站下载文件. 使用 `[parser]` 配置.
 
 ```toml
-[parsers]
+[parser]
 plugin_enable = true # 是否启用解析器插件
 plugin_dirs = ["./plugins"] # 插件目录, 可以是多个目录
 ```

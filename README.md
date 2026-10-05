@@ -67,6 +67,8 @@ chmod 600 config.toml
 
 模板已配置好名为“回传到聊天”的存储和用户白名单。`chat_id` 与 `id` 填写数字，不要填写 `@用户名`。
 
+配置层级、完整回传示例和多用户配置见 [配置文件结构](./docs/content/zh/deployment/configuration/_index.md#配置文件结构)。
+
 ### 3. 启动机器人
 
 在源码目录执行：

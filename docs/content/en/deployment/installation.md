@@ -25,7 +25,7 @@ Edit `config.toml`:
 | `[[storages]].chat_id` | Your numeric Telegram user ID, which receives relayed media |
 | `[[users]].id` | The same numeric user ID, authorized to use the bot |
 
-The template enables `reuse_media = true` and sends media to your private chat with the bot. See [configuration](./configuration/_index.md) for other storage backends and settings.
+The template enables `reuse_media = true` and sends media to your private chat with the bot. See [configuration structure](./configuration/_index.md#configuration-structure) for the hierarchy, a complete relay example, and multiple-user configuration.
 
 ## 3. Start
 
