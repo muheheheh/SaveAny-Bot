@@ -2,35 +2,17 @@
 title: Introduction
 ---
 
-# Save Any Bot
+# SaveAny-Bot (Telegram relay fork)
 
-![](https://img.shields.io/github/go-mod/go-version/krau/SaveAny-Bot?style=flat-square)
-![](https://img.shields.io/github/license/krau/SaveAny-Bot?style=flat-square)
-![](https://img.shields.io/github/v/release/krau/SaveAny-Bot?color=cyan&style=flat-square)
-![](https://img.shields.io/github/downloads/krau/SaveAny-Bot/total?style=flat-square)
+[muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot) adds direct Telegram media relay to the upstream project.
 
-Save Any Bot is a tool that allows you to save files from Telegram to various storage backends.
+- Enable `reuse_media = true` on Telegram storage to send single files and albums using existing references, without downloading or caching media files.
+- Album order and source captions are retained; captions are sent as plain text.
+- Rejected references fail the task without falling back to downloading.
+- Existing website downloads, storage backends, rules, and parsers remain available with their normal transfer and caching behavior.
 
-## 🎯 Features
+Start with [installation and updates](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/en/deployment/installation.md), or see [Telegram storage settings](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/en/deployment/configuration/storages.md#telegram). This repository contains the documentation for this fork.
 
-- Supports documents/videos/images/stickers... and even [Telegraph](https://telegra.ph/)
-- Breaks restrictions on saving files
-- Batch download
-- Streaming
-- Multi-user
-- Automatic organization based on storage rules
-- Watch specific chats and automatically save messages, with filters
-- Transfer files between different storage backends
-- Integrate with yt-dlp to download and save media from 1000+ websites
-- Aria2 integration to download files from URLs/magnets and save to storages
-- Write JS parser plugins to save files from almost any website
-- Supports multiple storage backends:
-    - Alist
-    - S3
-    - WebDAV
-    - Local disk
-    - Telegram (re-upload to specified chat)
+## Origin and license
 
-## [Contributors](https://github.com/krau/SaveAny-Bot/graphs/contributors)
-
-![Contributors](https://contrib.rocks/image?repo=krau/SaveAny-Bot&max=750&columns=20)
+Based on [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot), with thanks to the [upstream contributors](https://github.com/krau/SaveAny-Bot/graphs/contributors). The AGPL-3.0 license and upstream notices are retained.

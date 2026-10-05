@@ -1,97 +1,76 @@
-<div align="center">
-
-# <img src="docs/static/logo.png" width="45" align="center"> Save Any Bot
+# SaveAny-Bot (Telegram relay fork)
 
 **English** | [简体中文](./README_zh.md)
 
-> **Save Any Telegram File to Anywhere 📂. Support restrict saving content and beyond telegram.**
+A fork of [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot), maintained in
+[muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot), with direct
+Telegram media relay. Existing photos, videos, documents, and albums can be
+sent back using Telegram media references, without downloading or uploading
+the media bytes.
 
-[![Release Date](https://img.shields.io/github/release-date/krau/saveany-bot?label=release)](https://github.com/krau/saveany-bot/releases)
-[![tag](https://img.shields.io/github/v/tag/krau/saveany-bot.svg)](https://github.com/krau/saveany-bot/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/krau/saveany-bot/build-release.yml)](https://github.com/krau/saveany-bot/actions/workflows/build-release.yml)
-[![Stars](https://img.shields.io/github/stars/krau/saveany-bot?style=flat)](https://github.com/krau/saveany-bot/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/krau/saveany-bot/total)](https://github.com/krau/saveany-bot/releases)
-[![Issues](https://img.shields.io/github/issues/krau/saveany-bot)](https://github.com/krau/saveany-bot/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/krau/saveany-bot?label=pr)](https://github.com/krau/saveany-bot/pulls)
-[![License](https://img.shields.io/github/license/krau/saveany-bot)](./LICENSE)
+## What this fork adds
 
-</div>
+- Opt-in `reuse_media = true` for Telegram storage, covering single files and albums.
+- Original album order and plain-text captions are preserved.
+- No media cache files or automatic download fallback on the relay path.
+- Outgoing bot messages are ignored to prevent replies being processed again.
 
-## 🎯 Features
+The upstream storage backends, website parsers, yt-dlp, Aria2, rules, and other
+features remain available. Website downloads and saves to other backends use
+their normal transfer paths and may create temporary files. Reusing Telegram
+media preserves its original filename and type; renaming, conversion, and
+splitting do not apply. The bot must be able to read the source and Telegram
+must accept its media reference.
 
-- Support documents / videos / photos / stickers… and even [Telegraph](https://telegra.ph/)
-- Bypass "restrict saving content" media
-- Batch download
-- Streaming transfer
-- Multi-user support
-- Auto organize files based on storage rules
-- Watch specified chats and auto-save messages, with filters
-- Transfer files between different storage backends
-- Integrate with yt-dlp to download and save media from 1000+ websites
-- Aria2 integration to download files from URLs/magnets and save to storages
-- Write JS parser plugins to save files from almost any website
-- Storage backends:
-  - Alist
-  - S3
-  - WebDAV
-  - Local filesystem
-  - Rclone (via command line)
-  - Telegram (re-upload to specified chats)
+## Quick start
 
-## 📦 Quick Start
+Build from this repository to include the relay changes:
 
-Create a `config.toml` file with the following content:
-
-```toml
-lang = "en" # Language setting, "en" for English
-[telegram]
-token = "" # Your bot token, obtained from @BotFather
-[telegram.proxy]
-# Enable proxy for Telegram
-enable = false
-url = "socks5://127.0.0.1:7890"
-
-[[storages]]
-name = "Local Disk"
-type = "local"
-enable = true
-base_path = "./downloads"
-
-[[users]]
-id = 114514 # Your Telegram account id
-storages = []
-blacklist = true
+```sh
+git clone https://github.com/muheheheh/SaveAny-Bot.git
+cd SaveAny-Bot
+cp deploy/vps/config.example.toml config.toml
+chmod 600 config.toml
 ```
 
-Run Save Any Bot with Docker:
+Edit `config.toml`: set the BotFather token, and replace both `chat_id = 0`
+and `id = 0` with your own numeric Telegram user ID. The template enables
+`reuse_media` and restricts access to that user.
 
-```bash
-docker run -d --name saveany-bot \
-    -v ./config.toml:/app/config.toml \
-    -v ./downloads:/app/downloads \
-    ghcr.io/krau/saveany-bot:latest
+```sh
+docker compose up -d --build
 ```
 
-Please [**read the docs**](https://sabot.unv.app/en/) for more configuration options and usage.
+Start the bot in Telegram, use `/storage` to select the relay destination,
+then `/silent` to enable automatic processing. Send a Telegram message link
+or a media message to use the relay.
 
-## Sponsors
+For a small VPS, [build the binary locally and deploy it](./deploy/vps/README.md).
+The original upstream image does not include this fork's changes; the VPS
+template uses a pinned upstream image only for runtime dependencies and
+replaces its executable with the binary built from this fork.
 
-This project is supported by [YxVM](https://yxvm.com/) and [NodeSupport](https://github.com/NodeSeekDev/NodeSupport).
+## Documentation and updates
 
-If this project is helpful to you, consider sponsoring me via:
+- [Installation and updates](./docs/content/en/deployment/installation.md)
+- [Configuration](./docs/content/en/deployment/configuration/_index.md)
+- [Telegram storage and relay settings](./docs/content/en/deployment/configuration/storages.md#telegram)
+- [Usage](./docs/content/en/usage/_index.md)
+- [Report an issue in this fork](https://github.com/muheheheh/SaveAny-Bot/issues)
 
-- [Afdian](https://afdian.com/a/unvapp)
+Documentation is maintained in this repository. For source-built deployments,
+pull this fork and rebuild. `/update` and the CLI updater check releases in
+`muheheheh/SaveAny-Bot`; until releases are published here, update from source.
 
-## Thanks To
+## Origin and license
 
-- [gotd](https://github.com/gotd/td)
-- [TG-FileStreamBot](https://github.com/EverythingSuckz/TG-FileStreamBot)
-- [gotgproto](https://github.com/celestix/gotgproto)
-- [tdl](https://github.com/iyear/tdl)
-- All the dependencies, contributors, sponsors and users.
+Based on SaveAny-Bot by [krau](https://github.com/krau) and the
+[upstream contributors](https://github.com/krau/SaveAny-Bot/graphs/contributors).
+This fork retains the [AGPL-3.0 license](./LICENSE) and upstream notices.
+The Go module/import path remains `github.com/krau/SaveAny-Bot` for source
+compatibility; it is not the deployment or update source.
 
-## Contact
-
-- [![Group](https://img.shields.io/badge/ProjectSaveAny-Group-blue)](https://t.me/ProjectSaveAny)
-- [![Discussion](https://img.shields.io/badge/Github-Discussion-white)](https://github.com/krau/saveany-bot/discussions)
-- [![PersonalChannel](https://img.shields.io/badge/Krau-PersonalChannel-cyan)](https://t.me/acherkrau)
+Thanks to [gotd](https://github.com/gotd/td),
+[gotgproto](https://github.com/celestix/gotgproto),
+[TG-FileStreamBot](https://github.com/EverythingSuckz/TG-FileStreamBot),
+[tdl](https://github.com/iyear/tdl), and all upstream dependencies and contributors.

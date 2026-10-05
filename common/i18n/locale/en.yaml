@@ -20,7 +20,7 @@ parser:
 bot:
   msg:
     help_text_fmt: |
-      Save Any Bot - Save your Telegram files
+      SaveAny-Bot - Telegram relay fork
       Version: %s , Commit: %s
 
       Commands:
@@ -40,9 +40,9 @@ bot:
       /unwatch - Stop watching chats (UserBot)
       /lswatch - List watched chats (UserBot)
       /syncpeers - Sync peer chats (UserBot)
-      /update - Check and upgrade to latest version
+      /update - Check releases of this fork
 
-      Usage guide: https://sabot.unv.app/usage
+      Usage guide: https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md
     cmd:
       start: "Start using"
       silent: "Toggle silent mode"
@@ -75,7 +75,7 @@ bot:
 
       2. After setting default storage, send /save <channel_id/username> <message_id_range> to batch save files. Rules will be applied; if no rule matches, default storage will be used.
       Example:
-      /save @acherkrau 114-514
+      /save @channel_username 100-110
     watch_help_text: |
       Use /watch to watch messages in a chat and automatically save them to the default storage, following storage rules.
 
@@ -142,7 +142,7 @@ bot:
       error_build_dir_select_keyboard_failed: "Failed to build directory selection keyboard: {{.Error}}"
       error_no_permission: |
         You are not in the whitelist and cannot use this bot.
-        You can deploy your own instance: https://github.com/krau/SaveAny-Bot
+        You can deploy your own instance: https://github.com/muheheheh/SaveAny-Bot
     save:
       error_invalid_id_or_username: "Invalid ID or username: {{.Error}}"
     watch:

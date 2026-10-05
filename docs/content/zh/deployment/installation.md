@@ -4,11 +4,19 @@ title: "安装与更新"
 
 # 安装与更新
 
-## 从预编译文件部署(推荐)
+## 从本分支源码构建
 
-在 [Release](https://github.com/krau/SaveAny-Bot/releases) 页面下载对应平台的二进制文件.
+安装 Go 1.25 或更新版本，然后从本仓库构建：
 
-在解压后目录新建 `config.toml` 文件, 参考 [配置说明](../configuration) 编辑配置文件
+```sh
+git clone https://github.com/muheheheh/SaveAny-Bot.git
+cd SaveAny-Bot
+CGO_ENABLED=0 go build -trimpath -o saveany-bot .
+```
+
+本分支发布 Release 前，以源码构建为准。原作者的发布文件不包含本分支新增的快速回传功能。
+
+复制仓库内的 `deploy/vps/config.example.toml` 为 `config.toml`，填写 Bot Token、目标聊天 ID 和允许使用的用户 ID。模板默认启用快速回传。更多选项见 [配置说明](../configuration)。
 
 运行:
 
@@ -51,7 +59,7 @@ systemctl enable --now saveany-bot
 
 <h4>添加开机自启动服务</h4>
 
-创建文件 <code>/etc/init.d/saveanybot</code> ，参考 <a href="https://github.com/krau/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> 并自行修改:
+创建文件 <code>/etc/init.d/saveanybot</code> ，参考 <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> 并自行修改:
 
 {{< codeblock >}}
 #!/bin/sh /etc/rc.common
@@ -94,7 +102,7 @@ chmod +x /etc/rc.d/S99saveanybot
 
 <h4>添加快捷指令</h4>
 
-创建文件 <code>/usr/bin/sabot</code> ，参考 <a href="https://github.com/krau/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a>  并自行修改，注意此处文件编码仅支持 ANSI 936 .
+创建文件 <code>/usr/bin/sabot</code> ，参考 <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a>  并自行修改，注意此处文件编码仅支持 ANSI 936 .
 
 随后赋予权限:
 
@@ -110,60 +118,27 @@ chmod +x /usr/bin/sabot
 
 ## 使用 Docker 部署
 
-### Docker Compose
+在本仓库的完整源码目录中，按上文准备好 `config.toml` 后运行：
 
-下载 [docker-compose.yml](https://github.com/krau/SaveAny-Bot/blob/main/docker-compose.yml) 文件, 在同目录下新建 `config.toml` 文件, 参考 [config.example.toml](https://github.com/krau/SaveAny-Bot/blob/main/config.example.toml) 编辑配置文件.
-
-启动:
-
-```bash
-docker compose up -d
+```sh
+docker compose up -d --build
 ```
 
-### Docker
+根目录的 Compose 文件会从本分支构建镜像，不拉取上游应用镜像。
+小内存 VPS 可参考 [本地编译后部署](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md)，在开发机器编译后上传。
 
-```shell
-docker run -d --name saveany-bot \
-    -v /path/to/config.toml:/app/config.toml \
-    -v /path/to/downloads:/app/downloads \
-    ghcr.io/krau/saveany-bot:latest
-```
-
-{{< hint info >}}
-关于 docker 镜像的变体版本
-<br />
-<ul>
-<li>默认版本: 包含所有功能和依赖, 体积较大. 如果没有特殊需要, 请使用此版本</li>
-<li>micro: 精简版本, 去除部分可选依赖, 体积较小</li>
-<li>pico: 极简版本, 仅包含核心功能, 体积最小</li>
-</ul>
-你可以根据需要, 通过指定不同的标签来拉取合适的版本, 例如: <code>ghcr.io/krau/saveany-bot:micro</code>
-<br />
-关于变体版本的更详细的区别, 请参考项目根目录下的 Dockerfile 文件.
-{{< /hint >}}
+如需精简版本，可从本分支的 `Dockerfile.micro` 或 `Dockerfile.pico` 构建，并根据所需功能选择变体。各变体的依赖和构建标签见对应 Dockerfile。
 
 ## 更新
 
-若使用预编译二进制文件部署, 使用以下 CLI 命令更新:
+从本分支拉取更新后，重新构建并重建容器：
 
-```bash
-./saveany-bot up
+```sh
+git pull --ff-only
+docker compose up -d --build
 ```
 
-该命令会就地替换二进制文件; 已运行的 Bot 会在重启后才使用新版本. 也可以在 Telegram 中发送 `/update`, Bot 会自行下载新版本、替换自身二进制并就地重启进程 (Windows 上无法就地重启, 进程会退出, 由服务管理器启动新版本).
+如果使用本地编译后部署的 VPS 模板，请重新编译、上传二进制，再在服务器部署目录运行 `docker compose up -d --build`。
 
-如果是 Docker 部署, 使用以下命令更新:
-
-docker:
-
-```bash
-docker pull ghcr.io/krau/saveany-bot:latest
-docker restart saveany-bot
-```
-
-docker compose:
-
-```bash
-docker compose pull
-docker compose restart
-```
+原生二进制部署则重新运行上面的 Go 编译命令，替换可执行文件并重启服务。
+`/update` 和 `./saveany-bot up` 只查询本分支的 GitHub Release，尚未发布版本时无法通过它们更新；Docker 部署始终通过重新构建镜像更新。

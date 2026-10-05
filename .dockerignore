@@ -8,5 +8,8 @@ data/
 cache/
 docs/
 config.example.toml
+config.toml
+deploy/
+saveany-bot
 docker-compose.*
 playwright/

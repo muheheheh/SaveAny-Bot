@@ -2,36 +2,17 @@
 title: 介绍
 ---
 
-# Save Any Bot
+# SaveAny-Bot（Telegram 快速回传分支）
 
-![](https://img.shields.io/github/go-mod/go-version/krau/SaveAny-Bot?style=flat-square)
-![](https://img.shields.io/github/license/krau/SaveAny-Bot?style=flat-square)
-![](https://img.shields.io/github/v/release/krau/SaveAny-Bot?color=cyan&style=flat-square)
-![](https://img.shields.io/github/downloads/krau/SaveAny-Bot/total?style=flat-square)
+[muheheheh/SaveAny-Bot](https://github.com/muheheheh/SaveAny-Bot) 基于原项目增加了 Telegram 媒体快速回传。
 
-把 Telegram 上的文件转存到多种存储端.
+- Telegram 存储启用 `reuse_media = true` 后，单文件和相册直接复用媒体引用发送，不下载或缓存媒体文件。
+- 相册顺序和原消息说明文字会保留，说明文字按纯文本发送。
+- 引用发送失败时直接报错，不自动下载重传。
+- 原有网站下载、存储后端、规则和解析器仍可使用，它们保持原有传输和缓存行为。
 
-## 🎯 特性
+从 [安装与更新](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/installation.md) 开始，或查看 [Telegram 存储配置](https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/configuration/storages.md#telegram)。本分支文档以本仓库为准。
 
-- 支持文档/视频/图片/贴纸…甚至还有 [Telegraph](https://telegra.ph/)
-- 破解禁止保存的文件
-- 批量下载
-- 流式传输
-- 多用户使用
-- 基于存储规则的自动整理
-- 监听并自动转存指定聊天的消息, 支持过滤
-- 在不同存储端之间转存文件
-- 集成 yt-dlp, 从所支持的网站下载并转存媒体文件
-- 集成 Aria2, 支持直链/磁力下载和转存
-- 使用 js 编写解析器插件以转存任意网站的文件
-- 存储端支持:
-  - Alist
-  - S3
-  - WebDAV
-  - 本地磁盘
-  - Rclone (通过命令行调用)
-  - Telegram (重传回指定聊天)
+## 来源与许可证
 
-## [贡献者](https://github.com/krau/SaveAny-Bot/graphs/contributors)
-
-![Contributors](https://contrib.rocks/image?repo=krau/SaveAny-Bot&max=750&columns=20)
+基于 [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot)，感谢 [上游贡献者](https://github.com/krau/SaveAny-Bot/graphs/contributors)。保留 AGPL-3.0 许可证和原有版权声明。

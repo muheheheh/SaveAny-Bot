@@ -1,8 +1,11 @@
 services:
   saveany-bot:
-    image: ghcr.io/krau/saveany-bot:latest
+    image: saveany-bot:local
+    build: .
     container_name: saveany-bot
     restart: unless-stopped
+    stop_signal: SIGINT
+    stop_grace_period: 30s
     ports:
       - "8080:8080"
     volumes:

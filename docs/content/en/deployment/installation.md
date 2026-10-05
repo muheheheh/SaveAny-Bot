@@ -4,11 +4,19 @@ title: "Installation and Updates"
 
 # Installation and Updates
 
-## Deploy from Pre-compiled Binary (Recommended)
+## Build this fork from source
 
-Download the binary file for your platform from the [Release](https://github.com/krau/SaveAny-Bot/releases) page.
+Install Go 1.25 or newer, then build from this repository:
 
-Create a `config.toml` file in the extracted directory, refer to the [Configuration Guide](../configuration) to edit the configuration file.
+```sh
+git clone https://github.com/muheheheh/SaveAny-Bot.git
+cd SaveAny-Bot
+CGO_ENABLED=0 go build -trimpath -o saveany-bot .
+```
+
+Build from source until this fork publishes releases. Upstream release binaries do not include this fork's relay changes.
+
+Copy `deploy/vps/config.example.toml` to `config.toml`, then fill in the bot token, destination chat ID, and allowed user ID. The template enables media reuse. See the [Configuration Guide](../configuration) for other settings.
 
 Run:
 
@@ -51,7 +59,7 @@ systemctl enable --now saveany-bot
 
 <h4>Add Boot Autostart Service</h4>
 
-Create a file <code>/etc/init.d/saveanybot</code>, refer to <a href="https://github.com/krau/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> and modify as needed:
+Create a file <code>/etc/init.d/saveanybot</code>, refer to <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_init" target="_blank">wrt_init</a> and modify as needed:
 
 {{< codeblock >}}
 #!/bin/sh /etc/rc.common
@@ -94,7 +102,7 @@ chmod +x /etc/rc.d/S99saveanybot
 
 <h4>Add Shortcut Commands</h4>
 
-Create a file <code>/usr/bin/sabot</code>, refer to <a href="https://github.com/krau/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a> and modify as needed. Note that the file encoding here only supports ANSI 936.
+Create a file <code>/usr/bin/sabot</code>, refer to <a href="https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/confs/wrt_bin" target="_blank">wrt_bin</a> and modify as needed. Note that the file encoding here only supports ANSI 936.
 
 Then set permissions:
 
@@ -108,64 +116,29 @@ Usage: <code>sudo sabot start|stop|restart|status|enable|disable</code>
 {{< /tabs >}}
 
 
-## Deploy Using Docker
+## Deploy using Docker
 
-### Docker Compose
+From a full checkout of this repository, prepare `config.toml` as above and run:
 
-Download the [docker-compose.yml](https://github.com/krau/SaveAny-Bot/blob/main/docker-compose.yml) file, create a new `config.toml` file in the same directory, refer to [config.example.toml](https://github.com/krau/SaveAny-Bot/blob/main/config.example.toml) to edit the configuration file.
-
-Start:
-
-```bash
-docker compose up -d
+```sh
+docker compose up -d --build
 ```
 
-### Docker
+The root Compose file builds this fork instead of pulling the upstream application image.
+For a small VPS, [build locally and deploy the binary](https://github.com/muheheheh/SaveAny-Bot/blob/main/deploy/vps/README.md).
 
-```shell
-docker run -d --name saveany-bot \
-    -v /path/to/config.toml:/app/config.toml \
-    -v /path/to/downloads:/app/downloads \
-    ghcr.io/krau/saveany-bot:latest
-```
-
-{{< hint info >}}
-About Docker image variants
-<br />
-<ul>
-<li>Default: Includes all features and dependencies, larger in size. Use this if you don't have special requirements.</li>
-<li>micro: Slimmed-down image with some optional dependencies removed, smaller in size.</li>
-<li>pico: Minimal image containing only core features, smallest in size.</li>
-</ul>
-You can pull different variants by specifying tags, for example: <code>ghcr.io/krau/saveany-bot:micro</code>
-<br />
-For more details about the variants, see the Dockerfile in the project root.
-{{< /hint >}}
+Slim variants can be built from this fork's `Dockerfile.micro` or `Dockerfile.pico`. Choose the variant according to the dependencies and build tags in its Dockerfile.
 
 ## Updates
 
-If you deployed from pre-compiled binaries, use the following CLI command to update:
+Pull this fork, then rebuild and recreate the container:
 
-```bash
-./saveany-bot up
+```sh
+git pull --ff-only
+docker compose up -d --build
 ```
 
-(`upgrade` is also available as an alias.)
+For the VPS template, rebuild locally, upload the binary, and run `docker compose up -d --build` in the server deployment directory.
 
-The command replaces the binary in place; a running bot keeps the old version until it is restarted. You can also send `/update` to the bot: it downloads the new version, replaces its own binary and restarts itself in place (on Windows it exits instead, and the service manager starts the new version).
-
-If you deployed with Docker, use the following commands to update:
-
-docker:
-
-```bash
-docker pull ghcr.io/krau/saveany-bot:latest
-docker restart saveany-bot
-```
-
-docker compose:
-
-```bash
-docker compose pull
-docker compose restart
-```
+For native binary deployments, repeat the Go build command, replace the executable, and restart the service.
+`/update` and `./saveany-bot up` only query this fork's GitHub releases and cannot update until releases are published here. Docker deployments are updated by rebuilding their images.

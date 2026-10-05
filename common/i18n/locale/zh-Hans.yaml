@@ -20,7 +20,7 @@ parser:
 bot:
   msg:
     help_text_fmt: |
-      Save Any Bot - 转存你的 Telegram 文件
+      SaveAny-Bot - Telegram 快速回传分支
       版本: %s , 提交: %s
 
       命令:
@@ -41,9 +41,9 @@ bot:
       /unwatch - 取消监听聊天 (UserBot)
       /lswatch - 列出正在监听的聊天 (UserBot)
       /syncpeers - 同步对话列表 (UserBot)
-      /update - 检查更新并升级
+      /update - 检查本分支的发布版本
 
-      使用帮助: https://sabot.unv.app/usage
+      使用帮助: https://github.com/muheheheh/SaveAny-Bot/blob/main/README_zh.md
     cmd:
       start: "开始使用"
       silent: "切换静默模式"
@@ -76,7 +76,7 @@ bot:
 
       2. 设置默认存储后, 发送 /save <频道ID/用户名> <消息ID范围> 来批量保存文件. 遵从存储规则, 若未匹配到任何规则则使用默认存储.
       示例:
-      /save @acherkrau 114-514
+      /save @channel_username 100-110
     watch_help_text: |
       使用 /watch 命令监听一个聊天的消息, 并自动保存到默认存储中, 遵从存储规则.
 
@@ -143,7 +143,7 @@ bot:
       error_build_dir_select_keyboard_failed: "构建目录选择键盘失败: {{.Error}}"
       error_no_permission: |
         您不在白名单中, 无法使用此 Bot.
-        您可以部署自己的实例: https://github.com/krau/SaveAny-Bot
+        您可以部署自己的实例: https://github.com/muheheheh/SaveAny-Bot
     save:
       error_invalid_id_or_username: "无效的ID或用户名: {{.Error}}"
     watch:

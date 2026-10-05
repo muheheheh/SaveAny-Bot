@@ -28,5 +28,5 @@ session) and `cache` are mounted; the bot has no published network ports.
 
 Keep a copy of the previous binary, compose file, and configuration before
 upgrading. To roll back, restore those files, rebuild the local image, and run
-`docker compose up -d` again. Avoid the bot's upstream `/update` command when
-running this fork, since it installs an official binary without these changes.
+`docker compose up -d` again. `/update` checks releases in this fork; Docker
+deployments must be rebuilt and recreated from this fork's source or binary.
