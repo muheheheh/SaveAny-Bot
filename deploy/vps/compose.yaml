@@ -1,0 +1,14 @@
+services:
+  saveany-bot:
+    image: saveany-bot:fast-relay
+    build: .
+    container_name: saveany-bot
+    restart: unless-stopped
+    stop_signal: SIGINT
+    stop_grace_period: 30s
+    volumes:
+      - ./config.toml:/app/config.toml:ro
+      - ./data:/app/data
+      - ./cache:/app/cache
+    logging:
+      driver: local

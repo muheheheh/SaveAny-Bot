@@ -25,6 +25,12 @@ func responsibleUserID(u *ext.Update) int64 {
 }
 
 func checkPermission(ctx *ext.Context, update *ext.Update) error {
+	// MTProto also delivers messages sent by another session of this bot.
+	// In a private chat GetUserChat resolves the recipient, so the whitelist
+	// alone would accept our own replies and save them again.
+	if update.CallbackQuery == nil && update.EffectiveMessage != nil && update.EffectiveMessage.Out {
+		return dispatcher.EndGroups
+	}
 	userID := responsibleUserID(update)
 	if !slice.Contain(config.C().GetUsersID(), userID) {
 		if cbq := update.CallbackQuery; cbq != nil {

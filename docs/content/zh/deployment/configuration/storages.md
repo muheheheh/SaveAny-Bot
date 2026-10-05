@@ -78,6 +78,8 @@ https://s3.example.com/your_bucket_name/path/to/s3/your_file
 ```toml
 # Telegram 聊天 ID, Bot 将把文件发送到这个聊天
 chat_id = "123456789"
+# 直接复用 Telegram 媒体引用回传，默认关闭
+reuse_media = false
 # 是否强制使用文件方式发送, 默认为 false
 force_file = false
 # 是否跳过大文件, 默认为 false. 如果启用, 超过 Telegram 限制的文件将不会上传.
@@ -89,6 +91,10 @@ split_large_video = false
 # 当 skip_large 启用时, 该选项无效.
 split_size_mb = 0
 ```
+
+开启 `reuse_media` 后，从 Telegram 消息链接或收到的媒体保存到此存储时，直接使用已有的媒体引用发送单文件或相册，不下载文件、不创建媒体缓存，也不重新上传。相册顺序和每条消息的说明文字会保留；说明文字按纯文本发送。
+
+该模式保留原媒体类型和文件名，因此重命名、`force_file`、`skip_large` 和分卷设置不作用于这条路径。机器人必须能读取源消息，且发送账号必须能使用该媒体引用；Telegram 拒绝引用或引用过期时任务直接报错，不回退到下载重传。重新提交源链接会重新读取媒体引用。网站链接、外部下载和其他存储仍使用原有流程。
 
 ## Rclone
 

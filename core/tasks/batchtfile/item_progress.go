@@ -26,6 +26,7 @@ const (
 	ItemPhaseCompleted
 	ItemPhaseFailed
 	ItemPhaseStopped
+	ItemPhaseReusing
 )
 
 // FailureStage identifies the operation that failed for one batch item.

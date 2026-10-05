@@ -383,6 +383,8 @@ bot:
       batch_failure_stage_batch_upload: "批量上传"
       batch_failure_stage_internal: "任务内部"
       single_status_header: "<b>📦 正在处理</b>"
+      single_reusing: "<b>⚡ 正在回传 Telegram 媒体</b>\n\n<code>{{.Name}}</code>\n<i>直接复用媒体，无需下载或上传文件</i>"
+      batch_item_reusing: "<blockquote><b>⚡ {{.Index}}/{{.Total}} 正在回传</b>\n<code>{{.Name}}</code>\n<i>直接复用 Telegram 媒体</i></blockquote>"
       single_downloading: "<blockquote><b>⬇️ 下载中</b>\n<code>{{.Name}}</code>\n{{.Bar}} <code>{{.Progress}}%</code>\n速度：<code>{{.Speed}}</code>\n大小：<code>{{.Current}}</code> / <code>{{.Size}}</code>\n保存至：<code>{{.Destination}}</code></blockquote>"
       single_downloading_unknown: "<blockquote><b>⬇️ 下载中</b>\n<code>{{.Name}}</code>\n速度：<code>{{.Speed}}</code>\n大小：<code>{{.Current}}</code> / 未知\n保存至：<code>{{.Destination}}</code></blockquote>"
       single_uploading: "<blockquote><b>⬆️ 上传中</b>\n<code>{{.Name}}</code>\n{{.Bar}} <code>{{.Progress}}%</code>\n速度：<code>{{.Speed}}</code>\n大小：<code>{{.Current}}</code> / <code>{{.Size}}</code>\n保存至：<code>{{.Destination}}</code></blockquote>"

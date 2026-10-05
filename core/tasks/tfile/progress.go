@@ -24,6 +24,10 @@ type ProgressTracker interface {
 	OnDone(ctx context.Context, info TaskInfo, err error)
 }
 
+type ReuseProgressTracker interface {
+	OnReuseStart(ctx context.Context, info TaskInfo)
+}
+
 // UploadProgressTracker optionally extends a task progress tracker with a
 // distinct upload phase. Keeping it separate preserves compatibility with
 // custom download-only trackers.
@@ -78,6 +82,15 @@ func (p *Progress) OnStart(ctx context.Context, info TaskInfo) {
 	p.hasActualSize = false
 	log.FromContext(ctx).Debugf("Progress tracking started for message %d in chat %d", p.MessageID, p.ChatID)
 	p.editMessage(ctx, info.TaskID(), buildSingleProgressMessage(info, singlePhaseDownloading, 0, info.FileSize(), 0, 0), true)
+}
+
+func (p *Progress) OnReuseStart(ctx context.Context, info TaskInfo) {
+	p.updateMu.Lock()
+	defer p.updateMu.Unlock()
+	markup := localizedProgressMarkup(i18nk.BotMsgProgressSingleReusing, map[string]any{
+		"Name": info.FileName(),
+	})
+	p.editMessage(ctx, info.TaskID(), completeSingleMessage(markup), true)
 }
 
 func (p *Progress) OnProgress(ctx context.Context, info TaskInfo, downloaded, total int64) {
