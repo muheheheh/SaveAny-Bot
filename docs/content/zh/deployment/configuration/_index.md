@@ -34,6 +34,8 @@ SaveAny-Bot 使用 UTF-8 编码的 TOML 配置文件。Docker 部署时，在项
 
 ## Telegram 回传配置
 
+`reuse_media` 是每个 Telegram 存储的配置项，写在 `config.toml` 中 `type = "telegram"` 的 `[[storages]]` 组内，与 `chat_id` 同级。设为 `true` 开启直接回传；多个回传存储需要分别设置。
+
 下面是可直接保存为 `config.toml` 的完整回传配置。填写 Token，并把两处 `123456789` 替换为自己的 Telegram 数字用户 ID。仓库中的 [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) 提供同一结构的模板。
 
 ```toml

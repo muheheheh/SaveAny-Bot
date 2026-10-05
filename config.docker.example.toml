@@ -20,7 +20,7 @@ type = "telegram"
 enable = true
 chat_id = 0 # 与下面的用户 ID 一致。
 force_file = false
-reuse_media = true
+reuse_media = true # 当前 Telegram 存储的直接回传开关。
 
 [[users]]
 id = 0 # 替换为你的 Telegram 数字用户 ID（不是机器人 ID）。

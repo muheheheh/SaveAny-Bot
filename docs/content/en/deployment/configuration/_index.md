@@ -34,6 +34,8 @@ SaveAny-Bot uses a UTF-8 TOML configuration file. For Docker deployment, create 
 
 ## Telegram relay configuration
 
+Set `reuse_media` inside each `[[storages]]` table whose `type` is `"telegram"` in `config.toml`, at the same level as `chat_id`. Set it to `true` to enable direct relay. Configure it separately for each relay storage.
+
 Save the following complete relay configuration as `config.toml`. Fill in the token and replace both instances of `123456789` with your numeric Telegram user ID. The repository's [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) provides a template with the same structure.
 
 ```toml

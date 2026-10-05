@@ -67,7 +67,18 @@ chmod 600 config.toml
 
 模板已配置好名为“回传到聊天”的存储和用户白名单。`chat_id` 与 `id` 填写数字，不要填写 `@用户名`。
 
-配置层级、完整回传示例和多用户配置见 [配置文件结构](./docs/content/zh/deployment/configuration/_index.md#配置文件结构)。
+`reuse_media` 配置在 `config.toml` 中 `type = "telegram"` 的 `[[storages]]` 组内，与 `chat_id` 同级：
+
+```toml
+[[storages]]
+name = "回传到聊天"
+type = "telegram"
+enable = true
+chat_id = 123456789 # 替换为接收回传的聊天 ID。
+reuse_media = true # 开启直接回传。
+```
+
+配置层级、完整回传示例和多用户配置见 [配置说明](./docs/content/zh/deployment/configuration/_index.md#telegram-回传配置)。
 
 ### 3. 启动机器人
 
