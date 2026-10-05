@@ -4,13 +4,7 @@ title: Introduction
 
 # SaveAny-Bot
 
-SaveAny-Bot supports Telegram media relay, website downloads, and transfers to multiple storage backends.
-
-- Private-chat media and Telegram message links automatically relay to the current chat. Relay alone does not download or cache media.
-- Available storage enables saving after relay. Without storage, successful relay leaves no progress messages.
-- Album order and source captions are retained; captions are sent as plain text.
-- Rejected references leave an error without falling back to downloading.
-- Website downloads and other storage operations may use temporary files.
+SaveAny-Bot is a Telegram bot for media relay, file downloads, and storage management.
 
 ## Documentation
 

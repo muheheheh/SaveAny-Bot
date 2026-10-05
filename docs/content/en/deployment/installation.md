@@ -24,7 +24,7 @@ Edit `config.toml`:
 | `[telegram].token` | The bot token provided by BotFather |
 | `[[users]].id` | Your numeric Telegram user ID, authorized to use the bot |
 
-The template has no storage destinations and returns media to the current chat by default. Relay requires neither a default storage nor silent mode. See [configuration structure](./configuration/_index.md#configuration-structure) for the hierarchy, relay example, and storage setup.
+See [configuration](./configuration/_index.md) for all settings.
 
 ## 3. Start
 
@@ -45,7 +45,7 @@ docker compose logs --tail=100 -f
 
 Press `Ctrl+C` to stop following logs; the container keeps running.
 
-Open the bot's private chat, send `/start`, then send or forward media. To also save files, configure storage, select a default with `/storage`, and enable automatic saving with `/silent`. See [usage](../usage/_index.md) for details.
+Open a private chat with the bot and send `/start`. See [usage](../usage/_index.md) for instructions.
 
 ## Common operations
 
@@ -67,8 +67,6 @@ Configuration and data are mounted from the project directory:
 | `data/` | Sessions, database, and user settings |
 | `downloads/` | Default destination for local storage |
 | `cache/` | Temporary files for download tasks |
-
-Telegram media relay uses existing references without writing media cache files. Website downloads and other storage tasks use their respective transfer paths.
 
 ## Updates
 

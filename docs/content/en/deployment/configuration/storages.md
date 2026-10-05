@@ -83,8 +83,6 @@ split_large_video = false # Losslessly split oversized videos into one album of 
 split_size_mb = 0 # Split size in MB. 0 uses the uploader account limit: 2000 MB for bots/regular users and 4000 MB for Premium users. Oversized non-video files use ZIP parts. Ignored when skip_large is true.
 ```
 
-This storage uploads downloaded files to the chat specified by `chat_id`, applying file mode and splitting settings. Private-chat media is automatically relayed to the current chat; relay alone does not require this storage.
-
 ## Rclone
 
 `type=rclone`

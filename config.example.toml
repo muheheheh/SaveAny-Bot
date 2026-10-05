@@ -2,7 +2,6 @@
 # When creating this file, ensure the encoding is UTF-8 to preserve Chinese comments, otherwise it may fail to read.
 # 完整配置说明：https://github.com/muheheheh/SaveAny-Bot/blob/main/docs/content/zh/deployment/configuration/_index.md
 # Docker 部署可使用 config.docker.example.toml 模板，操作步骤见 README.md。
-# 私聊媒体默认回传到当前聊天；用户没有可用存储时只回传。
 workers = 4    # 同时下载文件数 / Number of concurrent downloads
 retry = 3      # 下载失败重试次数 / Number of retries on download failure
 threads = 4    # 单个任务下载使用的最大线程数 / Max threads per download task

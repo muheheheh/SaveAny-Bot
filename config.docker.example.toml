@@ -1,5 +1,4 @@
 # 复制为项目根目录的 config.toml，填写 Bot Token 和 Telegram 用户 ID 后启动。
-# Telegram 媒体默认回传到当前聊天，不下载或缓存媒体文件。
 lang = "zh-Hans"
 workers = 1
 threads = 2

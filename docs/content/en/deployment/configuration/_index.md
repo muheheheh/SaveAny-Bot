@@ -32,11 +32,9 @@ SaveAny-Bot uses a UTF-8 TOML configuration file. For Docker deployment, create 
 - Fields belong to the most recent table header. Blank lines and comments do not end a table. Put global fields before the first table header.
 - Quote strings; leave numbers and `true` / `false` unquoted. Text after `#` is a comment. See the [TOML documentation](https://toml.io/) for more syntax.
 
-## Telegram relay configuration
+## Basic configuration
 
-Sending or forwarding media, or sending Telegram message links, in a private chat automatically relays the media to that chat. Relay is always enabled and needs no switch or destination setting.
-
-Save the following complete configuration as `config.toml`. Fill in the token and replace `123456789` with your numeric Telegram user ID. It enables relay without storage. The repository's [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) provides the same structure.
+Save the following as `config.toml`, fill in the bot token, and replace `123456789` with your numeric Telegram user ID. You can also copy the repository's [configuration template](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml).
 
 ```toml
 lang = "en"
@@ -63,18 +61,18 @@ blacklist = false
 | --- | --- | --- |
 | `lang` | String | Bot message language; `"en"` selects English |
 | `workers` | Integer | Number of concurrent download and save tasks |
-| `threads` | Integer | Download threads; relay does not download media |
-| `stream` | Boolean | Streaming for downloads and saving; does not affect relay |
+| `threads` | Integer | Download threads |
+| `stream` | Boolean | Enables streaming transfers |
 | `level` in `[log]` | String | Log level; this example uses `"info"` |
 | `token` in `[telegram]` | String | Bot token provided by BotFather |
 | `enable` in `[api]` | Boolean | Enables the HTTP API |
 | `id` in `[[users]]` | Integer | Telegram user ID authorized to operate the bot |
-| `storages` in `[[users]]` | List of strings | Available storage names; empty in this example for relay only |
+| `storages` in `[[users]]` | List of strings | The user's storage list |
 | `blacklist` in `[[users]]` | Boolean | `false` allows only listed storages; `true` excludes listed storages |
 
-Saving depends on the current user's available storages. With none available, the bot only relays. Otherwise it relays, then asks for a storage or saves automatically. An empty list with `blacklist = true` allows all enabled storages and does not restrict the user to relay only.
+Use `storages = []` with `blacklist = false` for relay only. With `blacklist = true`, an empty list allows all enabled storages.
 
-Add another `[[users]]` entry for each additional user. Media always returns to the chat that initiated the request:
+Add a `[[users]]` entry for each additional user:
 
 ```toml
 [[users]]
@@ -83,7 +81,7 @@ storages = []
 blacklist = false
 ```
 
-### Saving as well
+### File storage
 
 Configure a storage and add its name to the user's `storages` list. For example, append:
 
@@ -95,11 +93,9 @@ enable = true
 base_path = "./downloads"
 ```
 
-Then change the relevant user's `storages = []` to `storages = ["Local files"]`. After relay, the bot asks where to save. Select a default with `/storage` and enable automatic saving with `/silent` to use the default storage and rules. These preferences are saved in the database.
+Then set the user's `storages` to `["Local files"]`. The user can now select this storage when saving files.
 
-See [storage configuration](./storages.md) for other backends. A Telegram storage's `chat_id` is an additional save destination, independent of relay to the current chat.
-
-Relay alone does not require `/storage` or `/silent`. Successful relay leaves no progress messages; errors remain visible. Save tasks retain their progress and results.
+See [storage configuration](./storages.md) for backend settings and [usage](../../usage/_index.md#saving-and-task-management) for instructions.
 
 Unused tables can be omitted. Run `docker compose restart` after editing `config.toml` to apply changes.
 
@@ -230,7 +226,7 @@ token = "your-token"
 
 ### Log Configuration
 
-- `level`: Log level. One of `debug`, `info`, `warn`, `error`, `fatal`. Default is `debug`; the relay template uses `info`.
+- `level`: Log level. One of `debug`, `info`, `warn`, `error`, `fatal`. Default is `debug`.
 
 ```toml
 [log]

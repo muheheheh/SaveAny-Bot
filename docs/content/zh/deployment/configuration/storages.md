@@ -90,8 +90,6 @@ split_large_video = false
 split_size_mb = 0
 ```
 
-此存储用于将下载的文件上传到 `chat_id` 指定的聊天，支持文件发送、分卷等保存设置。私聊媒体会自动回传到当前聊天；只需要回传时，无需配置此存储。
-
 ## Rclone
 
 `type=rclone`

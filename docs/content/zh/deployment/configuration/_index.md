@@ -32,11 +32,9 @@ SaveAny-Bot 使用 UTF-8 编码的 TOML 配置文件。Docker 部署时，在项
 - 字段属于它上方最近的配置组，空行和注释不会结束配置组。全局字段应写在第一个配置组之前。
 - 字符串加引号，数字和 `true` / `false` 不加引号；`#` 后是注释。更多语法见 [TOML 文档](https://toml.io/)。
 
-## Telegram 回传配置
+## 基础配置
 
-私聊发送或转发媒体、发送 Telegram 消息链接后，机器人会自动回传到当前聊天。回传始终开启，不需要单独开关或目标聊天配置。
-
-下面是可直接保存为 `config.toml` 的完整配置。填写 Token，并把 `123456789` 替换为自己的 Telegram 数字用户 ID。此配置不启用存储，只回传媒体。仓库中的 [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) 提供同一结构的模板。
+将以下内容保存为 `config.toml`，填写 Bot Token，并把 `123456789` 替换为自己的 Telegram 数字用户 ID。也可复制仓库中的 [配置模板](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml)。
 
 ```toml
 lang = "zh-Hans"
@@ -63,18 +61,18 @@ blacklist = false
 | --- | --- | --- |
 | `lang` | 字符串 | 机器人消息语言，`"zh-Hans"` 为简体中文 |
 | `workers` | 整数 | 同时执行的下载保存任务数量 |
-| `threads` | 整数 | 下载线程数；回传不下载媒体 |
-| `stream` | 布尔值 | 下载保存是否使用流式传输；不影响回传 |
+| `threads` | 整数 | 下载线程数 |
+| `stream` | 布尔值 | 是否使用流式传输 |
 | `[log]` 中的 `level` | 字符串 | 日志级别，示例使用 `"info"` |
 | `[telegram]` 中的 `token` | 字符串 | BotFather 提供的机器人 Token |
 | `[api]` 中的 `enable` | 布尔值 | 是否启用 HTTP API |
 | `[[users]]` 中的 `id` | 整数 | 允许操作机器人的 Telegram 用户 ID |
-| `[[users]]` 中的 `storages` | 字符串列表 | 用户可用的存储名称；上例为空，表示只回传 |
+| `[[users]]` 中的 `storages` | 字符串列表 | 用户的存储列表 |
 | `[[users]]` 中的 `blacklist` | 布尔值 | `false` 只允许列表中的存储；`true` 排除列表中的存储 |
 
-是否保存由当前用户的可用存储决定：没有可用存储时只回传；有可用存储时，回传后继续选择存储或自动保存。`blacklist = true` 配合空列表表示允许所有已启用存储，不能用于限制用户只回传。
+`storages = []` 和 `blacklist = false` 表示只回传、不保存。将 `blacklist` 设为 `true` 时，空列表表示允许使用全部已启用的存储。
 
-增加用户只需追加一组 `[[users]]`，媒体会各自返回发起请求的聊天：
+添加用户时，追加一组 `[[users]]`：
 
 ```toml
 [[users]]
@@ -83,7 +81,7 @@ storages = []
 blacklist = false
 ```
 
-### 同时保存
+### 文件保存
 
 需要保存时，配置存储并将名称加入该用户的 `storages`。例如，在上面的配置末尾增加：
 
@@ -95,11 +93,9 @@ enable = true
 base_path = "./downloads"
 ```
 
-然后将对应用户配置中的 `storages = []` 改为 `storages = ["本地文件"]`。机器人回传媒体后会询问保存位置；使用 `/storage` 选择默认存储，再用 `/silent` 开启自动保存，可按默认存储和规则保存。这两个用户设置保存在数据库中。
+然后将对应用户的 `storages` 改为 `["本地文件"]`，该用户即可选择这个存储保存文件。
 
-其他存储参数见 [存储端配置](./storages.md)。其中 Telegram 存储的 `chat_id` 是额外保存的目标，与回传到当前聊天无关。
-
-只回传时不需要 `/storage` 或 `/silent`。成功后不会保留进度消息，失败信息会保留。有保存任务时，保留原有保存进度和结果。
+各类存储参数见 [存储端配置](./storages.md)，操作步骤见 [使用说明](../../usage/_index.md#保存与任务管理)。
 
 未使用的配置组可以省略。修改 `config.toml` 后，执行 `docker compose restart` 使配置生效。
 
@@ -230,7 +226,7 @@ token = "your-token"
 
 ### 日志配置
 
-- `level`: 日志级别, 可选 `debug`, `info`, `warn`, `error`, `fatal`. 默认为 `debug`，回传模板设为 `info`.
+- `level`: 日志级别, 可选 `debug`, `info`, `warn`, `error`, `fatal`. 默认为 `debug`.
 
 ```toml
 [log]

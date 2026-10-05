@@ -24,7 +24,7 @@ chmod 600 config.toml
 | `[telegram].token` | BotFather 提供的 Bot Token |
 | `[[users]].id` | 允许使用机器人的 Telegram 数字用户 ID |
 
-模板未配置存储，默认将媒体返回当前聊天。只回传无需选择存储或开启静默模式。配置层级、完整回传示例和保存配置见 [配置文件结构](./configuration/_index.md#配置文件结构)。
+完整配置见 [配置说明](./configuration/_index.md)。
 
 ## 3. 启动
 
@@ -45,7 +45,7 @@ docker compose logs --tail=100 -f
 
 按 `Ctrl+C` 退出日志查看，容器继续运行。
 
-打开机器人私聊，发送 `/start` 后即可发送或转发媒体。需要同时保存时，再配置存储，通过 `/storage` 选择默认存储，用 `/silent` 开启自动保存。详细操作见 [使用说明](../usage/_index.md)。
+打开机器人私聊，发送 `/start` 后即可使用。详细操作见 [使用说明](../usage/_index.md)。
 
 ## 常用操作
 
@@ -67,8 +67,6 @@ docker compose logs --tail=100 -f
 | `data/` | 会话、数据库和用户设置 |
 | `downloads/` | 本地存储的默认保存目录 |
 | `cache/` | 下载任务的临时目录 |
-
-Telegram 媒体回传使用已有媒体引用，不写入媒体缓存。网站下载和其他存储任务按各自流程处理文件。
 
 ## 更新
 
