@@ -271,8 +271,6 @@ func formatActiveItemMarkup(item TaskItemProgress, total int) string {
 		"Reason":   truncateRunes(item.Error, maxDisplayErrorRunes),
 	}
 	switch item.Phase {
-	case ItemPhaseReusing:
-		return localizedProgressMarkup(i18nk.BotMsgProgressBatchItemReusing, data)
 	case ItemPhaseDownloading:
 		if item.Size <= 0 {
 			return localizedProgressMarkup(i18nk.BotMsgProgressBatchItemDownloadingUnknown, data)
@@ -363,7 +361,7 @@ func aggregateSpeeds(items []TaskItemProgress) (download, upload float64) {
 
 func isTransferPhase(phase ItemPhase) bool {
 	switch phase {
-	case ItemPhaseDownloading, ItemPhaseTransferring, ItemPhaseUploading, ItemPhaseRetrying, ItemPhaseReusing:
+	case ItemPhaseDownloading, ItemPhaseTransferring, ItemPhaseUploading, ItemPhaseRetrying:
 		return true
 	default:
 		return false

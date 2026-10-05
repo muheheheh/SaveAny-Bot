@@ -6,9 +6,10 @@ title: Introduction
 
 SaveAny-Bot supports Telegram media relay, website downloads, and transfers to multiple storage backends.
 
-- Enable `reuse_media = true` on Telegram storage to send single files and albums using existing references, without downloading or caching media files.
+- Private-chat media and Telegram message links automatically relay to the current chat. Relay alone does not download or cache media.
+- Available storage enables saving after relay. Without storage, successful relay leaves no progress messages.
 - Album order and source captions are retained; captions are sent as plain text.
-- Rejected references fail the task without falling back to downloading.
+- Rejected references leave an error without falling back to downloading.
 - Website downloads and other storage operations may use temporary files.
 
 ## Documentation

@@ -31,15 +31,6 @@ type StorageCannotStream interface {
 	CannotStream() string
 }
 
-// StorageTelegramReuser sends existing Telegram media without downloading it.
-// Items form one source album or a single file. onSent is called after Telegram
-// confirms each item; a later error must not cause already sent items to retry.
-type StorageTelegramReuser interface {
-	Storage
-	ReuseTelegramMedia() bool
-	SaveTelegramMedia(ctx context.Context, items []storagetypes.TelegramItem, onSent func(index int)) error
-}
-
 // StorageBatchSaver can preserve relationships between files when saving a
 // logical batch, such as a Telegram media album.
 type StorageBatchSaver interface {
@@ -84,7 +75,6 @@ type StorageReadable interface {
 
 var _ StorageProgressSaver = (*telegram.Telegram)(nil)
 var _ StorageBatchProgressSaver = (*telegram.Telegram)(nil)
-var _ StorageTelegramReuser = (*telegram.Telegram)(nil)
 
 var _ StorageListable = (*alist.Alist)(nil)
 var _ StorageReadable = (*alist.Alist)(nil)

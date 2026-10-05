@@ -116,14 +116,6 @@ func (t *Task) processElements(ctx context.Context, elems []*TaskElement) error 
 	eg.SetLimit(config.C().Workers)
 	for _, elem := range elems {
 		eg.Go(func() error {
-			if reuser, ok := elem.Storage.(storage.StorageTelegramReuser); ok && reuser.ReuseTelegramMedia() {
-				err := t.reuseMedia(gctx, reuser, []*TaskElement{elem})
-				if err != nil && t.IgnoreErrors && !errors.Is(err, context.Canceled) {
-					log.FromContext(ctx).Warnf("Element %s failed (ignored): %v", elem.ID, err)
-					return nil
-				}
-				return err
-			}
 			if err := t.markProcessing(ctx, elem); err != nil {
 				return err
 			}
@@ -141,9 +133,6 @@ func (t *Task) processElements(ctx context.Context, elems []*TaskElement) error 
 }
 
 func (t *Task) processBatch(ctx context.Context, group executionGroup) error {
-	if reuser, ok := group.batchSaver.(storage.StorageTelegramReuser); ok && reuser.ReuseTelegramMedia() {
-		return t.reuseMedia(ctx, reuser, group.elems)
-	}
 	defer func() {
 		for _, elem := range group.elems {
 			if err := os.Remove(elem.localPath); err != nil && !os.IsNotExist(err) {

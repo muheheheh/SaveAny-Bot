@@ -77,16 +77,13 @@ Stream mode is not supported.
 
 ```toml
 chat_id = 123456789 # Telegram chat ID, the bot will send files to this chat
-reuse_media = false # Reuse existing Telegram media references directly. Disabled by default.
 force_file = false # Force sending as file, default is false
 skip_large = false # Skip large files, default is false. If enabled, files exceeding Telegram's limit will not be uploaded.
 split_large_video = false # Losslessly split oversized videos into one album of up to 10 independently playable parts. Falls back to ZIP parts on failure or when more than 10 parts are required.
 split_size_mb = 0 # Split size in MB. 0 uses the uploader account limit: 2000 MB for bots/regular users and 4000 MB for Premium users. Oversized non-video files use ZIP parts. Ignored when skip_large is true.
 ```
 
-With `reuse_media` enabled, saving Telegram message links or received media to this storage sends existing media references as single files or albums. No media is downloaded, cached, or uploaded again. Album order and each source caption are preserved; captions are sent as plain text.
-
-This path preserves the original media type and filename, so renaming, `force_file`, `skip_large`, and splitting settings do not apply. The bot must be able to read the source, and the sending account must be able to use its media references. Rejected or expired references fail the task without falling back to downloading. Submitting the source link again fetches fresh references. Website links, external downloads, and other storage backends keep their existing behavior.
+This storage uploads downloaded files to the chat specified by `chat_id`, applying file mode and splitting settings. Private-chat media is automatically relayed to the current chat; relay alone does not require this storage.
 
 ## Rclone
 

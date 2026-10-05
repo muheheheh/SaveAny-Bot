@@ -23,6 +23,8 @@ bot:
       SaveAny-Bot
       Version: %s, Commit: %s
 
+      Send or forward media to receive it in this chat. Configure storage to also save it.
+
       Commands:
       /start - Start using the bot
       /help - Show help
@@ -47,6 +49,8 @@ bot:
       /update - Check for updates
 
       Usage guide: https://github.com/muheheheh/SaveAny-Bot/blob/main/README.md
+    relay:
+      error_failed: "Relay was not fully completed: {{.Error}}"
     cmd:
       start: "Start using"
       silent: "Toggle silent mode"
@@ -386,8 +390,6 @@ bot:
       batch_failure_stage_batch_upload: "batch upload"
       batch_failure_stage_internal: "internal task"
       single_status_header: "<b>📦 Processing</b>"
-      single_reusing: "<b>⚡ Sending existing Telegram media</b>\n\n<code>{{.Name}}</code>\n<i>Reusing media without downloading or uploading files</i>"
-      batch_item_reusing: "<blockquote><b>⚡ {{.Index}}/{{.Total}} Sending existing media</b>\n<code>{{.Name}}</code>\n<i>Reusing Telegram media directly</i></blockquote>"
       single_downloading: "<blockquote><b>⬇️ Downloading</b>\n<code>{{.Name}}</code>\n{{.Bar}} <code>{{.Progress}}%</code>\nSpeed: <code>{{.Speed}}</code>\nSize: <code>{{.Current}}</code> / <code>{{.Size}}</code>\nSave to: <code>{{.Destination}}</code></blockquote>"
       single_downloading_unknown: "<blockquote><b>⬇️ Downloading</b>\n<code>{{.Name}}</code>\nSpeed: <code>{{.Speed}}</code>\nSize: <code>{{.Current}}</code> / unknown\nSave to: <code>{{.Destination}}</code></blockquote>"
       single_uploading: "<blockquote><b>⬆️ Uploading</b>\n<code>{{.Name}}</code>\n{{.Bar}} <code>{{.Progress}}%</code>\nSpeed: <code>{{.Speed}}</code>\nSize: <code>{{.Current}}</code> / <code>{{.Size}}</code>\nSave to: <code>{{.Destination}}</code></blockquote>"

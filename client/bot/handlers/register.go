@@ -27,11 +27,11 @@ var CommandHandlers = []DescCommandHandler{
 	{"storage", i18nk.BotMsgCmdStorage, handleStorageCmd},
 	{"dir", i18nk.BotMsgCmdDir, handleDirCmd},
 	{"rule", i18nk.BotMsgCmdRule, handleRuleCmd},
-	{"save", i18nk.BotMsgCmdSave, handleSilentMode(handleSaveCmd, handleSilentSaveReplied)},
-	{"dl", i18nk.BotMsgCmdDl, handleDlCmd},
-	{"aria2dl", i18nk.BotMsgCmdAria2dl, handleAria2DlCmd},
-	{"ytdlp", i18nk.BotMsgCmdYtdlp, handleYtdlpCmd},
-	{"transfer", i18nk.BotMsgCmdTransfer, handleTransferCmd},
+	{"save", i18nk.BotMsgCmdSave, withAvailableStorage(handleSilentMode(handleSaveCmd, handleSilentSaveReplied))},
+	{"dl", i18nk.BotMsgCmdDl, withAvailableStorage(handleDlCmd)},
+	{"aria2dl", i18nk.BotMsgCmdAria2dl, withAvailableStorage(handleAria2DlCmd)},
+	{"ytdlp", i18nk.BotMsgCmdYtdlp, withAvailableStorage(handleYtdlpCmd)},
+	{"transfer", i18nk.BotMsgCmdTransfer, withAvailableStorage(handleTransferCmd)},
 	{"task", i18nk.BotMsgCmdTask, handleTaskCmd},
 	{"cancel", i18nk.BotMsgCmdCancel, handleCancelCmd},
 	{"config", i18nk.BotMsgCmdConfig, handleConfigCmd},
@@ -61,9 +61,9 @@ func Register(disp dispatcher.Dispatcher, botCtx *ext.Context) {
 	disp.AddHandler(handlers.NewCallbackQuery(filters.CallbackQuery.Prefix(tcbdata.TypeSetDefault), withPermission(handleSetDefaultCallback)))
 	disp.AddHandler(handlers.NewCallbackQuery(filters.CallbackQuery.Prefix(tcbdata.TypeCancel), withPermission(handleCancelCallback)))
 	disp.AddHandler(handlers.NewCallbackQuery(filters.CallbackQuery.Prefix(tcbdata.TypeConfig), withPermission(handleConfigCallback)))
-	disp.AddHandler(handlers.NewMessage(sabotfilters.RegexUrl(regexp.MustCompile(re.TgMessageLinkRegexString)), handleSilentMode(handleMessageLink, handleSilentSaveLink)))
+	disp.AddHandler(handlers.NewMessage(sabotfilters.RegexUrl(regexp.MustCompile(re.TgMessageLinkRegexString)), handleMessageLink))
 	disp.AddHandler(handlers.NewMessage(sabotfilters.RegexUrl(regexp.MustCompile(re.TelegraphUrlRegexString)), handleSilentMode(handleTelegraphUrlMessage, handleSilentSaveTelegraph)))
-	disp.AddHandler(handlers.NewMessage(filters.Message.Media, handleSilentMode(handleMediaMessage, handleSilentSaveMedia)))
+	disp.AddHandler(handlers.NewMessage(filters.Message.Media, handleMediaMessage))
 	disp.AddHandler(handlers.NewMessage(filters.Message.Text, handleSilentMode(handleTextMessage, handleSilentSaveText)))
 
 	if config.C().Telegram.Userbot.Enable {

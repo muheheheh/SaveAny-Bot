@@ -15,7 +15,7 @@ SaveAny-Bot uses a UTF-8 TOML configuration file. For Docker deployment, create 
 | `[telegram.proxy]` | Proxy used for Telegram connections |
 | `[telegram.userbot]` | User account login and session settings |
 | `[log]` | Log level |
-| `[[storages]]` | One storage or relay destination; repeat for additional destinations |
+| `[[storages]]` | One storage for saving files; repeat for additional storages |
 | `[[users]]` | One authorized user and their available storages; repeat for additional users |
 | `[api]` | HTTP API switch, listen address, and authentication token |
 | `[aria2]` | Aria2 RPC connection and downloaded file retention |
@@ -34,9 +34,9 @@ SaveAny-Bot uses a UTF-8 TOML configuration file. For Docker deployment, create 
 
 ## Telegram relay configuration
 
-Set `reuse_media` inside each `[[storages]]` table whose `type` is `"telegram"` in `config.toml`, at the same level as `chat_id`. Set it to `true` to enable direct relay. Configure it separately for each relay storage.
+Sending or forwarding media, or sending Telegram message links, in a private chat automatically relays the media to that chat. Relay is always enabled and needs no switch or destination setting.
 
-Save the following complete relay configuration as `config.toml`. Fill in the token and replace both instances of `123456789` with your numeric Telegram user ID. The repository's [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) provides a template with the same structure.
+Save the following complete configuration as `config.toml`. Fill in the token and replace `123456789` with your numeric Telegram user ID. It enables relay without storage. The repository's [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) provides the same structure.
 
 ```toml
 lang = "en"
@@ -53,60 +53,55 @@ token = "YOUR_BOTFATHER_TOKEN"
 [api]
 enable = false
 
-[[storages]]
-name = "Relay to chat"
-type = "telegram"
-enable = true
-chat_id = 123456789
-force_file = false
-reuse_media = true
-
 [[users]]
 id = 123456789
-storages = ["Relay to chat"]
+storages = []
 blacklist = false
 ```
 
 | Setting | Type | Purpose |
 | --- | --- | --- |
 | `lang` | String | Bot message language; `"en"` selects English |
-| `workers` | Integer | Number of tasks executed concurrently |
-| `threads` | Integer | Threads used for regular downloads; direct relay does not download media |
-| `stream` | Boolean | Streaming for regular downloads; `reuse_media` controls direct relay |
+| `workers` | Integer | Number of concurrent download and save tasks |
+| `threads` | Integer | Download threads; relay does not download media |
+| `stream` | Boolean | Streaming for downloads and saving; does not affect relay |
 | `level` in `[log]` | String | Log level; this example uses `"info"` |
 | `token` in `[telegram]` | String | Bot token provided by BotFather |
-| `enable` in `[api]` | Boolean | Enables the HTTP API; leave `false` when using the bot through Telegram |
-| `name` in `[[storages]]` | String | Storage name, unique across all storages |
-| `type` in `[[storages]]` | String | Use `"telegram"` to relay to Telegram |
-| `enable` in `[[storages]]` | Boolean | Set to `true` to enable this storage |
-| `chat_id` in `[[storages]]` | Integer | Fixed relay destination; use your user ID to relay to your private chat |
-| `reuse_media` in `[[storages]]` | Boolean | Set to `true` to send existing Telegram media references directly |
-| `force_file` in `[[storages]]` | Boolean | Forces regular uploads to be sent as files; direct relay preserves the original media type |
+| `enable` in `[api]` | Boolean | Enables the HTTP API |
 | `id` in `[[users]]` | Integer | Telegram user ID authorized to operate the bot |
-| `storages` in `[[users]]` | List of strings | References the storage names defined above; names must match |
+| `storages` in `[[users]]` | List of strings | Available storage names; empty in this example for relay only |
 | `blacklist` in `[[users]]` | Boolean | `false` allows only listed storages; `true` excludes listed storages |
 
-`chat_id` determines who receives media; `users.id` determines who can use the bot. Use the same ID for both when relaying to yourself. Each storage has a fixed destination. To relay separately for multiple users, define a storage for each user and reference it in that user's `storages` list.
+Saving depends on the current user's available storages. With none available, the bot only relays. Otherwise it relays, then asks for a storage or saves automatically. An empty list with `blacklist = true` allows all enabled storages and does not restrict the user to relay only.
 
-For example, append the following to add user `987654321`:
+Add another `[[users]]` entry for each additional user. Media always returns to the chat that initiated the request:
 
 ```toml
-[[storages]]
-name = "Second user"
-type = "telegram"
-enable = true
-chat_id = 987654321
-reuse_media = true
-
 [[users]]
 id = 987654321
-storages = ["Second user"]
+storages = []
 blacklist = false
 ```
 
-After startup, each user selects their default storage with `/storage` and enables automatic processing with `/silent`. These preferences are stored in the database. A destination `chat_id` can also identify a group or channel where the bot has permission to send messages. See [Telegram storage configuration](./storages.md#telegram) for related settings.
+### Saving as well
 
-Unused optional configuration tables can be omitted. Run `docker compose restart` after editing `config.toml` to apply the changes.
+Configure a storage and add its name to the user's `storages` list. For example, append:
+
+```toml
+[[storages]]
+name = "Local files"
+type = "local"
+enable = true
+base_path = "./downloads"
+```
+
+Then change the relevant user's `storages = []` to `storages = ["Local files"]`. After relay, the bot asks where to save. Select a default with `/storage` and enable automatic saving with `/silent` to use the default storage and rules. These preferences are saved in the database.
+
+See [storage configuration](./storages.md) for other backends. A Telegram storage's `chat_id` is an additional save destination, independent of relay to the current chat.
+
+Relay alone does not require `/storage` or `/silent`. Successful relay leaves no progress messages; errors remain visible. Save tasks retain their progress and results.
+
+Unused tables can be omitted. Run `docker compose restart` after editing `config.toml` to apply changes.
 
 ## Detailed Configuration
 

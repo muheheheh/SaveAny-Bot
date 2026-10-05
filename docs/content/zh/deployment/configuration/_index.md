@@ -15,7 +15,7 @@ SaveAny-Bot 使用 UTF-8 编码的 TOML 配置文件。Docker 部署时，在项
 | `[telegram.proxy]` | Telegram 连接使用的代理 |
 | `[telegram.userbot]` | 用户账号登录及会话配置 |
 | `[log]` | 日志级别 |
-| `[[storages]]` | 一个存储或回传目标，可重复定义多个 |
+| `[[storages]]` | 一个保存文件的存储，可重复定义多个 |
 | `[[users]]` | 一个授权用户及其可用存储，可重复定义多个 |
 | `[api]` | HTTP API 开关、监听地址和认证 Token |
 | `[aria2]` | Aria2 RPC 连接及下载文件保留设置 |
@@ -34,9 +34,9 @@ SaveAny-Bot 使用 UTF-8 编码的 TOML 配置文件。Docker 部署时，在项
 
 ## Telegram 回传配置
 
-`reuse_media` 是每个 Telegram 存储的配置项，写在 `config.toml` 中 `type = "telegram"` 的 `[[storages]]` 组内，与 `chat_id` 同级。设为 `true` 开启直接回传；多个回传存储需要分别设置。
+私聊发送或转发媒体、发送 Telegram 消息链接后，机器人会自动回传到当前聊天。回传始终开启，不需要单独开关或目标聊天配置。
 
-下面是可直接保存为 `config.toml` 的完整回传配置。填写 Token，并把两处 `123456789` 替换为自己的 Telegram 数字用户 ID。仓库中的 [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) 提供同一结构的模板。
+下面是可直接保存为 `config.toml` 的完整配置。填写 Token，并把 `123456789` 替换为自己的 Telegram 数字用户 ID。此配置不启用存储，只回传媒体。仓库中的 [config.docker.example.toml](https://github.com/muheheheh/SaveAny-Bot/blob/main/config.docker.example.toml) 提供同一结构的模板。
 
 ```toml
 lang = "zh-Hans"
@@ -53,60 +53,55 @@ token = "填入 BotFather 提供的 Token"
 [api]
 enable = false
 
-[[storages]]
-name = "回传到聊天"
-type = "telegram"
-enable = true
-chat_id = 123456789
-force_file = false
-reuse_media = true
-
 [[users]]
 id = 123456789
-storages = ["回传到聊天"]
+storages = []
 blacklist = false
 ```
 
 | 配置项 | 类型 | 作用 |
 | --- | --- | --- |
 | `lang` | 字符串 | 机器人消息语言，`"zh-Hans"` 为简体中文 |
-| `workers` | 整数 | 同时执行的任务数量 |
-| `threads` | 整数 | 普通下载任务的线程数；直接回传不下载媒体 |
-| `stream` | 布尔值 | 普通下载任务是否使用流式传输；回传由 `reuse_media` 控制 |
+| `workers` | 整数 | 同时执行的下载保存任务数量 |
+| `threads` | 整数 | 下载线程数；回传不下载媒体 |
+| `stream` | 布尔值 | 下载保存是否使用流式传输；不影响回传 |
 | `[log]` 中的 `level` | 字符串 | 日志级别，示例使用 `"info"` |
 | `[telegram]` 中的 `token` | 字符串 | BotFather 提供的机器人 Token |
-| `[api]` 中的 `enable` | 布尔值 | 是否启用 HTTP API；通过 Telegram 使用机器人时可保持 `false` |
-| `[[storages]]` 中的 `name` | 字符串 | 存储名称，在所有存储中唯一 |
-| `[[storages]]` 中的 `type` | 字符串 | 回传到 Telegram 时填写 `"telegram"` |
-| `[[storages]]` 中的 `enable` | 布尔值 | 设为 `true` 启用这个存储 |
-| `[[storages]]` 中的 `chat_id` | 整数 | 固定的回传目标；回传到自己的私聊时填写自己的用户 ID |
-| `[[storages]]` 中的 `reuse_media` | 布尔值 | 设为 `true` 复用 Telegram 媒体引用，直接回传 |
-| `[[storages]]` 中的 `force_file` | 布尔值 | 普通上传时是否强制作为文件发送；直接回传保留原媒体类型 |
+| `[api]` 中的 `enable` | 布尔值 | 是否启用 HTTP API |
 | `[[users]]` 中的 `id` | 整数 | 允许操作机器人的 Telegram 用户 ID |
-| `[[users]]` 中的 `storages` | 字符串列表 | 引用上面定义的存储名称，名称必须一致 |
-| `[[users]]` 中的 `blacklist` | 布尔值 | `false` 表示只允许使用列表中的存储；`true` 表示排除列表中的存储 |
+| `[[users]]` 中的 `storages` | 字符串列表 | 用户可用的存储名称；上例为空，表示只回传 |
+| `[[users]]` 中的 `blacklist` | 布尔值 | `false` 只允许列表中的存储；`true` 排除列表中的存储 |
 
-`chat_id` 决定媒体发给谁，`users.id` 决定谁能使用机器人。它们在回传给自己时填写相同值。一个存储的 `chat_id` 是固定目标，多个用户分别回传到自己时，应各自定义一个存储，并在各自的 `users.storages` 中引用。
+是否保存由当前用户的可用存储决定：没有可用存储时只回传；有可用存储时，回传后继续选择存储或自动保存。`blacklist = true` 配合空列表表示允许所有已启用存储，不能用于限制用户只回传。
 
-例如，新增用户 `987654321` 时，可在文件末尾追加：
+增加用户只需追加一组 `[[users]]`，媒体会各自返回发起请求的聊天：
 
 ```toml
-[[storages]]
-name = "第二位用户"
-type = "telegram"
-enable = true
-chat_id = 987654321
-reuse_media = true
-
 [[users]]
 id = 987654321
-storages = ["第二位用户"]
+storages = []
 blacklist = false
 ```
 
-启动后，每个用户通过 `/storage` 选择自己的默认存储，用 `/silent` 开启自动处理。这两个设置保存在数据库中。配置中的 `chat_id` 也可以是机器人有发送权限的群组或频道 ID；相关参数见 [Telegram 存储配置](./storages.md#telegram)。
+### 同时保存
 
-未使用的扩展配置组可以省略。修改 `config.toml` 后，执行 `docker compose restart` 使配置生效。
+需要保存时，配置存储并将名称加入该用户的 `storages`。例如，在上面的配置末尾增加：
+
+```toml
+[[storages]]
+name = "本地文件"
+type = "local"
+enable = true
+base_path = "./downloads"
+```
+
+然后将对应用户配置中的 `storages = []` 改为 `storages = ["本地文件"]`。机器人回传媒体后会询问保存位置；使用 `/storage` 选择默认存储，再用 `/silent` 开启自动保存，可按默认存储和规则保存。这两个用户设置保存在数据库中。
+
+其他存储参数见 [存储端配置](./storages.md)。其中 Telegram 存储的 `chat_id` 是额外保存的目标，与回传到当前聊天无关。
+
+只回传时不需要 `/storage` 或 `/silent`。成功后不会保留进度消息，失败信息会保留。有保存任务时，保留原有保存进度和结果。
+
+未使用的配置组可以省略。修改 `config.toml` 后，执行 `docker compose restart` 使配置生效。
 
 ## 详细配置
 

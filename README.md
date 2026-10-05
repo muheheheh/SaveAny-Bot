@@ -1,6 +1,6 @@
 # SaveAny-Bot
 
-支持 Telegram 媒体回传、网站下载和多存储转存的机器人。Telegram 媒体可通过已有引用直接发送，无需服务器下载或重新上传。
+支持 Telegram 媒体回传、网站下载和多存储转存的机器人。私聊发送或转发媒体后，机器人通过已有引用直接返回当前聊天；用户有可用存储时，再进入保存流程。
 
 [使用说明](./docs/content/zh/usage/_index.md) · [Docker 部署](./docs/content/zh/deployment/installation.md) · [配置说明](./docs/content/zh/deployment/configuration/_index.md) · [反馈问题](https://github.com/muheheheh/SaveAny-Bot/issues)
 
@@ -8,11 +8,11 @@
 
 | 功能 | 说明 |
 | --- | --- |
-| Telegram 媒体快速回传 | 启用 `reuse_media = true` 后，直接发送已有媒体引用，支持单文件和相册 |
+| Telegram 媒体快速回传 | 默认返回当前聊天，支持单文件和相册，无需配置开关或固定目标 |
 | 相册与说明文字 | 保留媒体顺序和各条消息的说明文字；说明文字按纯文本发送 |
 | Telegram 消息链接 | 发送消息链接，读取其中的媒体并回传或转存；需要具备源消息访问权限 |
 | 批量处理 | 支持相册和按消息 ID 范围批量保存，可按消息文本过滤 |
-| 自动处理 | 用 `/storage` 设置默认存储，用 `/silent` 开启收到媒体后自动处理 |
+| 自动保存 | 配置存储后，用 `/storage` 设置默认存储，用 `/silent` 开启自动保存 |
 | 多种存储 | 支持 Telegram、本地磁盘、S3、MinIO、WebDAV、AList 和 Rclone |
 | 文件直链下载 | 用 `/dl` 下载一个或多个 HTTP/HTTPS 文件链接 |
 | 网站内容解析 | 支持 Telegraph 文章图片、内置 Twitter/X 与 Kemono 解析器，可用 JavaScript 插件扩展 |
@@ -30,11 +30,13 @@
 
 | 使用场景 | 文件处理方式 |
 | --- | --- |
-| Telegram 媒体 → 启用 `reuse_media` 的 Telegram 存储 | 只复用媒体引用，不下载、不缓存、不重新上传媒体文件 |
+| 私聊媒体或 Telegram 媒体消息链接 → 当前聊天 | 默认回传，不下载、不缓存、不重新上传媒体文件 |
 | 网站、直链、yt-dlp、Aria2 → Telegram 或其他存储 | 按原有下载和上传流程处理，可能产生临时文件 |
-| Telegram 媒体 → 本地磁盘或其他存储 | 按对应存储的下载、流式传输或上传流程处理 |
+| 同时保存或主动执行保存命令 | 按原有下载、流式传输或上传流程处理，可能产生临时文件 |
 
-快速回传保留原文件名和媒体类型，不执行重命名、格式转换、强制文件发送或分卷。引用失效、权限不足或 Telegram 拒绝发送时，任务直接报错，不会自动切换为下载重传。
+快速回传保留原文件名和媒体类型，不执行重命名、格式转换、强制文件发送或分卷。引用失效、权限不足或 Telegram 拒绝发送时，保留回传错误，不会自动切换为下载重传。已配置的保存流程独立执行。
+
+只回传时，成功后自动删除本次解析链接的临时提示，失败或部分失败时保留错误。用户原消息和回传媒体始终保留；保存任务继续显示原来的进度和结果。
 
 机器人仍需在服务器保存配置、会话和用户设置等运行数据。纯文本聊天记录、投票等不属于媒体回传范围；受访问权限或内容保护限制的消息不保证可处理。
 
@@ -60,25 +62,12 @@ chmod 600 config.toml
 | 配置项 | 填写方式 |
 | --- | --- |
 | `[telegram].token` | BotFather 提供的 Bot Token |
-| `[[storages]].chat_id` | 你自己的 Telegram 数字用户 ID，机器人将媒体返回到这个私聊 |
-| `[[users]].id` | 同一个数字用户 ID，仅允许该用户使用机器人 |
-| `[[storages]].reuse_media` | 保持 `true`，启用 Telegram 快速回传 |
+| `[[users]].id` | 允许使用机器人的 Telegram 数字用户 ID |
 | `lang` | 保持 `"zh-Hans"`，使用简体中文消息 |
 
-模板已配置好名为“回传到聊天”的存储和用户白名单。`chat_id` 与 `id` 填写数字，不要填写 `@用户名`。
+模板未配置存储，默认只回传。无需设置回传开关或目标聊天 ID。多个用户可分别添加 `[[users]]`，媒体会返回各自的当前聊天。
 
-`reuse_media` 配置在 `config.toml` 中 `type = "telegram"` 的 `[[storages]]` 组内，与 `chat_id` 同级：
-
-```toml
-[[storages]]
-name = "回传到聊天"
-type = "telegram"
-enable = true
-chat_id = 123456789 # 替换为接收回传的聊天 ID。
-reuse_media = true # 开启直接回传。
-```
-
-配置层级、完整回传示例和多用户配置见 [配置说明](./docs/content/zh/deployment/configuration/_index.md#telegram-回传配置)。
+需要同时保存时，再配置存储和用户的存储权限。完整结构和示例见 [配置说明](./docs/content/zh/deployment/configuration/_index.md#telegram-回传配置)。
 
 ### 3. 启动机器人
 
@@ -94,12 +83,11 @@ docker compose logs --tail=100 -f
 ### 4. 在 Telegram 中使用
 
 1. 打开自己的机器人私聊，点击 **Start** 或发送 `/start`。
-2. 发送 `/storage`，选择 **回传到聊天**，设置为默认存储。
-3. 发送一次 `/silent`，确认机器人提示已开启静默模式。这个命令是开关，再发一次会关闭。
-4. 发送或转发图片、视频、文档或整组相册，也可以发送机器人能够读取的 Telegram 消息链接。
-5. 机器人会把媒体发送到配置的目标聊天，并反馈处理结果。
+2. 发送或转发图片、视频、文档、整组相册，或发送机器人能够读取的 Telegram 媒体消息链接。
+3. 机器人直接把媒体返回当前聊天。没有可用存储时，处理到此结束。
+4. 配置存储后，可在回传后选择保存目标；也可用 `/storage` 设置默认存储，再用 `/silent` 开启自动保存。
 
-关闭静默模式时，机器人会先让你选择目标存储。完整操作和更多场景见 [使用说明](./docs/content/zh/usage/_index.md)。
+`/save`、网站下载和聊天监听继续使用原来的保存流程。完整操作见 [使用说明](./docs/content/zh/usage/_index.md)。
 
 ## 常用命令
 
@@ -107,7 +95,7 @@ docker compose logs --tail=100 -f
 | --- | --- |
 | `/start`、`/help` | 查看帮助 |
 | `/storage` | 选择默认存储 |
-| `/silent` | 开启或关闭自动处理 |
+| `/silent` | 开启或关闭自动保存 |
 | `/save` | 回复一条媒体消息时保存它；也支持按聊天和消息 ID 范围批量保存 |
 | `/task`、`/task queued` | 查看执行中的任务、查看排队任务 |
 | `/cancel <任务ID>` | 取消指定任务 |
@@ -129,7 +117,7 @@ git pull --ff-only
 docker compose up -d --build
 ```
 
-配置和数据保存在挂载目录中，更新容器时会继续使用。
+配置和数据保存在挂载目录中，更新容器时会继续使用。旧版只用于回传的 Telegram 存储应从配置中删除，并清空用户对应的 `storages` 列表；回传已改为默认行为，保留存储会继续触发保存。
 
 ## 文档
 

@@ -95,3 +95,15 @@ func handleSilentMode(next func(*ext.Context, *ext.Update) error, handler func(*
 		return handler(ctx, update)
 	}
 }
+
+func withAvailableStorage(handler func(*ext.Context, *ext.Update) error) func(*ext.Context, *ext.Update) error {
+	return func(ctx *ext.Context, update *ext.Update) error {
+		if len(storage.GetUserStorages(ctx, update.GetUserChat().GetID())) == 0 {
+			if _, err := ctx.Reply(update, ext.ReplyTextString(i18n.T(i18nk.BotMsgCommonErrorNoAvailableStorage)), nil); err != nil {
+				return err
+			}
+			return dispatcher.EndGroups
+		}
+		return handler(ctx, update)
+	}
+}

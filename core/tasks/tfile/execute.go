@@ -21,16 +21,6 @@ import (
 
 func (t *Task) Execute(ctx context.Context) error {
 	logger := log.FromContext(ctx).WithPrefix(fmt.Sprintf("file[%s]", t.File.Name()))
-	if reuser, ok := t.Storage.(storage.StorageTelegramReuser); ok && reuser.ReuseTelegramMedia() {
-		if progress, ok := t.Progress.(ReuseProgressTracker); ok {
-			progress.OnReuseStart(ctx, t)
-		}
-		err := reuser.SaveTelegramMedia(ctx, []storagetypes.TelegramItem{{File: t.File, StoragePath: t.Path}}, nil)
-		if t.Progress != nil {
-			t.Progress.OnDone(ctx, t, err)
-		}
-		return err
-	}
 	if t.Progress != nil {
 		t.Progress.OnStart(ctx, t)
 	}

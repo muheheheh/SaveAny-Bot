@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"cmp"
+	"errors"
+	"slices"
 	"sync"
 	"time"
 
@@ -9,15 +12,9 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/gotd/td/tg"
 	"github.com/krau/SaveAny-Bot/client/bot/handlers/utils/mediautil"
-	"github.com/krau/SaveAny-Bot/client/bot/handlers/utils/msgelem"
-	"github.com/krau/SaveAny-Bot/client/bot/handlers/utils/shortcut"
-	"github.com/krau/SaveAny-Bot/common/i18n"
-	"github.com/krau/SaveAny-Bot/common/i18n/i18nk"
 	"github.com/krau/SaveAny-Bot/config"
 	"github.com/krau/SaveAny-Bot/database"
-	"github.com/krau/SaveAny-Bot/pkg/tcbdata"
 	"github.com/krau/SaveAny-Bot/pkg/tfile"
-	"github.com/krau/SaveAny-Bot/storage"
 )
 
 // mediaGroupKey uniquely identifies a media group by chat, sender, and group
@@ -55,7 +52,6 @@ var (
 
 func handleGroupMediaMessage(ctx *ext.Context, update *ext.Update, message *tg.Message, groupID int64) error {
 	mediaGroupHandler.SetupTimeout(max(config.C().Telegram.MediaGroupTimeout, 1))
-	logger := log.FromContext(ctx)
 	media := message.Media
 	supported := mediautil.IsSupported(media)
 	if !supported {
@@ -69,8 +65,7 @@ func handleGroupMediaMessage(ctx *ext.Context, update *ext.Update, message *tg.M
 	tfOpts := mediautil.TfileOptions(ctx, userDB, message)
 	file, err := tfile.FromMediaMessage(media, ctx.Raw, message, tfOpts...)
 	if err != nil {
-		logger.Errorf("Failed to get file from media: %s", err)
-		return dispatcher.EndGroups
+		return reportRelayError(ctx, update, 0, err)
 	}
 	mediaGroupHandler.mu.Lock()
 	defer mediaGroupHandler.mu.Unlock()
@@ -106,43 +101,10 @@ func processMediaGroup(ctx *ext.Context, update *ext.Update, key mediaGroupKey) 
 	}
 	logger.Debugf("Processing media group %d with %d items", key.groupID, len(items))
 
-	userId := update.GetUserChat().GetID()
-	msg, err := ctx.Reply(update, ext.ReplyTextString(i18n.T(i18nk.BotMsgMediaGroupInfoSavingFiles, nil)), nil)
-	if err != nil {
-		logger.Errorf("Failed to reply: %s", err)
-		return
-	}
-	stor := storage.FromContext(ctx)
-	if stor != nil {
-		// In silent mode
-		if len(items) == 1 {
-			shortcut.CreateAndAddTGFileTaskWithEdit(ctx, userId, stor, "", items[0], msg.ID)
-			return
-		}
-		shortcut.CreateAndAddBatchTGFileTaskWithEdit(ctx, userId, stor, "", items, msg.ID)
-		return
-	}
-
-	stors := storage.GetUserStorages(ctx, userId)
-	markup, err := msgelem.BuildAddSelectStorageKeyboard(stors, tcbdata.Add{
-		Files:   items,
-		AsBatch: len(items) > 1,
+	slices.SortFunc(items, func(a, b tfile.TGFileMessage) int {
+		return cmp.Compare(a.Message().GetID(), b.Message().GetID())
 	})
-	if err != nil {
-		logger.Errorf("Failed to build storage selection keyboard: %s", err)
-		ctx.EditMessage(userId, &tg.MessagesEditMessageRequest{
-			ID: msg.ID,
-			Message: i18n.T(i18nk.BotMsgMediaGroupErrorBuildStorageSelectKeyboardFailed, map[string]any{
-				"Error": err.Error(),
-			}),
-		})
-		return
+	if err := processTelegramFiles(ctx, update, items, 0, nil); err != nil && !errors.Is(err, dispatcher.EndGroups) {
+		logger.Errorf("Failed to process media group: %v", err)
 	}
-	ctx.EditMessage(userId, &tg.MessagesEditMessageRequest{
-		ID: msg.ID,
-		Message: i18n.T(i18nk.BotMsgMediaGroupInfoGroupFoundFilesSelectStorage, map[string]any{
-			"Count": len(items),
-		}),
-		ReplyMarkup: markup,
-	})
 }

@@ -3,6 +3,7 @@ package shortcut
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -86,20 +87,24 @@ func GetFilesFromUpdateLinkMessageWithReplyEdit(ctx *ext.Context, update *ext.Up
 		return nil, nil, nil, dispatcher.EndGroups
 	}
 	files = make([]tfile.TGFileMessage, 0, len(msgLinks))
+	var fetchErr error
 	addFile := func(client downloader.Client, msg *tg.Message) {
 		if msg == nil || msg.Media == nil {
 			logger.Warn("message is nil, skipping")
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("source message has no media"))
 			return
 		}
 		media, ok := msg.GetMedia()
 		if !ok {
 			logger.Debugf("message %d has no media", msg.GetID())
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("message %d has no media", msg.GetID()))
 			return
 		}
 		opts := mediautil.TfileOptions(ctx, user, msg)
 		file, err := tfile.FromMediaMessage(media, client, msg, opts...)
 		if err != nil {
 			logger.Errorf("failed to create file from media: %s", err)
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("read media from message %d: %w", msg.GetID(), err))
 			return
 		}
 		files = append(files, file)
@@ -116,16 +121,19 @@ func GetFilesFromUpdateLinkMessageWithReplyEdit(ctx *ext.Context, update *ext.Up
 		linkUrl, err := url.Parse(link)
 		if err != nil {
 			logger.Errorf("failed to parse message link %s: %s", link, err)
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("parse message link: %w", err))
 			continue
 		}
 		chatId, msgId, err := tgutil.ParseMessageLink(tctx, link)
 		if err != nil {
 			logger.Errorf("failed to parse message link %s: %s", link, err)
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("resolve message link: %w", err))
 			continue
 		}
 		msg, err := tgutil.GetMessageByID(tctx, chatId, msgId)
 		if err != nil {
 			logger.Error(err)
+			fetchErr = errors.Join(fetchErr, fmt.Errorf("read message %d: %w", msgId, err))
 			continue
 		}
 		groupID, isGroup := msg.GetGroupedID()
@@ -133,6 +141,7 @@ func GetFilesFromUpdateLinkMessageWithReplyEdit(ctx *ext.Context, update *ext.Up
 			gmsgs, err := tgutil.GetGroupedMessages(tctx, chatId, msg)
 			if err != nil {
 				logger.Errorf("failed to get grouped messages: %s", err)
+				fetchErr = errors.Join(fetchErr, fmt.Errorf("read media group: %w", err))
 			} else {
 				for _, gmsg := range gmsgs {
 					addFile(tctx.Raw, gmsg)
@@ -146,7 +155,7 @@ func GetFilesFromUpdateLinkMessageWithReplyEdit(ctx *ext.Context, update *ext.Up
 		editReplied(i18n.T(i18nk.BotMsgCommonErrorNoSavableFilesFound, nil), nil)
 		return nil, nil, nil, dispatcher.EndGroups
 	}
-	return replied, files, editReplied, nil
+	return replied, files, editReplied, fetchErr
 }
 
 func GetCallbackDataWithAnswer[DataType any](ctx *ext.Context, update *ext.Update, dataid string) (DataType, error) {
